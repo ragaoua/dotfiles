@@ -4,31 +4,28 @@
 
 A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
 
-## 🛠️ Installation
+# 🛠️ Installation
 
-#### Make a backup of your current nvim and shared folder
+## Backup the current config
 
-```shell
+~~~shell
 mv ~/.config/nvim ~/.config/nvim.bak
 mv ~/.local/share/nvim ~/.local/share/nvim.bak
 mv ~/.local/state/nvim ~/.local/state/nvim.bak
 mv ~/.cache/nvim ~/.cache/nvim.bak
-```
+~~~
 
-#### Create a new user repository from this template
+## Install this config
 
-Press the "Use this template" button above to create a new repository to store your user configuration.
+~~~shell
+git clone <this_repo> <repo_directory>
+ln -s <repo_directory>/neovim ~/.config/nvim
+~~~
 
-You can also just clone this repository directly if you do not want to track your user configuration in GitHub.
+## Alias vi to nvim
 
-#### Clone the repository
-
-```shell
-git clone https://github.com/<your_user>/<your_repository> ~/.config/nvim
-```
-
-#### Start Neovim
-
-```shell
-nvim
-```
+~~~shell
+cat >/etc/profile.d/vi.sh <<EOF
+alias vi=nvim
+EOF
+~~~
