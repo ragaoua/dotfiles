@@ -1,3 +1,4 @@
+alias gc="git commit"
 alias gs="git status"
 alias gb="git branch"
 alias gba="git branch --all"
