@@ -1,6 +1,6 @@
 # Installation
 
-(Eventually) backup the current config
+(Eventually) backup the current config :
 
 ~~~bash
 mv ${HOME}/.config/nvim ${HOME}/.config/nvim.bak
@@ -9,10 +9,17 @@ mv ${HOME}/.local/state/nvim ${HOME}/.local/state/nvim.bak
 mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
 ~~~
 
-Install this config
+Install this config :
 
 ~~~bash
 ln -s <repo_directory> ${HOME}/.config/nvim
+~~~
+
+Install dependencies :
+
+~~~bash
+# ripgrep is required for telescopes's grepping features
+brew install ripgrep
 ~~~
 
 # Alias vi to nvim
