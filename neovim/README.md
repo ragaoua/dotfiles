@@ -1,31 +1,22 @@
-# AstroNvim Template
+# Installation
 
-**NOTE:** This is for AstroNvim v4+
+(Eventually) backup the current config
 
-A template for getting started with [AstroNvim](https://github.com/AstroNvim/AstroNvim)
-
-# 🛠️ Installation
-
-## Backup the current config
-
-~~~shell
-mv ~/.config/nvim ~/.config/nvim.bak
-mv ~/.local/share/nvim ~/.local/share/nvim.bak
-mv ~/.local/state/nvim ~/.local/state/nvim.bak
-mv ~/.cache/nvim ~/.cache/nvim.bak
+~~~bash
+mv ${HOME}/.config/nvim ${HOME}/.config/nvim.bak
+mv ${HOME}/.local/share/nvim ${HOME}/.local/share/nvim.bak
+mv ${HOME}/.local/state/nvim ${HOME}/.local/state/nvim.bak
+mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
 ~~~
 
-## Install this config
+Install this config
 
-~~~shell
-git clone <this_repo> <repo_directory>
-ln -s <repo_directory>/neovim ~/.config/nvim
+~~~bash
+ln -s <repo_directory> ${HOME}/.config/nvim
 ~~~
 
-## Alias vi to nvim
+# Alias vi to nvim
 
-~~~shell
 cat >/etc/profile.d/vi.sh <<EOF
 alias vi=nvim
 EOF
-~~~
