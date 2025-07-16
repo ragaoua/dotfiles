@@ -1,5 +1,4 @@
 - file formatting (onsave / manual)
-- telescope config (kickstart)
 - tree sitter
 - lsp
 - cmp
