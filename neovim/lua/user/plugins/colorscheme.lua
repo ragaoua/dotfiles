@@ -4,11 +4,14 @@ return {
 	config = function()
 		---@diagnostic disable-next-line: missing-fields
 		require("tokyonight").setup({
+			transparent = true,
 			styles = {
 				comments = { italic = false }, -- Disable italics in comments
 			},
 		})
 
 		vim.cmd.colorscheme("tokyonight-night")
+
+		vim.api.nvim_set_hl(0, "LineNr", { fg = "#888888", bold = true })
 	end,
 }
