@@ -4,4 +4,3 @@ require("user.keymaps")
 require("user.autocommands")
 require("user.floating-terminal")
 require("user.lazy")
-
