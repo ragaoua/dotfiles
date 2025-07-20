@@ -22,6 +22,10 @@ require("lazy").setup({
 		lazy = false,
 		version = false, -- always use the latest git commit
 	},
+	change_detection = {
+		enabled = false,
+		notify = false,
+	},
 	checker = {
 		enabled = true, -- check for plugin updates periodically
 		notify = false, -- don't notify on update
