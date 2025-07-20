@@ -26,9 +26,10 @@ return {
 					toggle = true,
 					position = "right",
 					source = "filesystem",
+					dir = vim.fn.expand("%:p:h"),
 				})
 			end,
-			desc = "NeoTree toggle filesystem",
+			desc = "NeoTree toggle current buffer's filesystem",
 		},
 		{
 			"<leader>ne",
@@ -40,7 +41,7 @@ return {
 					dir = vim.fn.stdpath("config"),
 				})
 			end,
-			desc = "NeoTree toggle buffers",
+			desc = "NeoTree toggle neovim filesystem",
 		},
 		{
 			"<leader>be",
