@@ -13,7 +13,6 @@ return {
 			function()
 				require("neo-tree.command").execute({
 					toggle = true,
-					position = "right",
 					source = "last",
 				})
 			end,
@@ -24,7 +23,6 @@ return {
 			function()
 				require("neo-tree.command").execute({
 					toggle = true,
-					position = "right",
 					source = "filesystem",
 					dir = vim.fn.expand("%:p:h"),
 				})
@@ -36,7 +34,6 @@ return {
 			function()
 				require("neo-tree.command").execute({
 					toggle = true,
-					position = "right",
 					source = "filesystem",
 					dir = vim.fn.stdpath("config"),
 				})
@@ -48,7 +45,6 @@ return {
 			function()
 				require("neo-tree.command").execute({
 					toggle = true,
-					position = "right",
 					source = "buffers",
 				})
 			end,
@@ -56,8 +52,10 @@ return {
 		},
 	},
 	opts = {
+		close_if_last_window = true,
 		filesystem = {
 			window = {
+				position = "right",
 				mappings = {
 					["<Tab>"] = "open",
 				},
