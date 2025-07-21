@@ -1,5 +1,5 @@
 alias ll='ls -l --color'
-alias lla='ls -a'
+alias lla='ls -la'
 
 # Change  the  current  directory then list its content
 cdl() {
