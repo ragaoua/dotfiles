@@ -59,6 +59,8 @@ return {
 				position = "right",
 				mappings = {
 					["<Tab>"] = "open",
+					["z"] = "close_all_subnodes",
+					["Z"] = "expand_all_subnodes",
 				},
 			},
 		},
