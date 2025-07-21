@@ -18,6 +18,7 @@ return { -- Highlight, edit, and navigate code
 			"vim",
 			"vimdoc",
 		},
+    highlight = { enable = true },
 		-- Autoinstall languages that are not installed
 		auto_install = true,
 		indent = { enable = true },
