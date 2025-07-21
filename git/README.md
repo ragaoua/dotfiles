@@ -3,6 +3,7 @@
 Execute :
 
 ~~~bash
-ln "git/.gitignore" "${HOME}/.gitignore"
-git config --global core.excludesFile "${HOME}/.gitignore"
+mkdir -p ${HOME}/.config/git
+ln "git/.gitignore" "${HOME}/.config/git/.gitignore"
+git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
 ~~~
