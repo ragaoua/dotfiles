@@ -13,6 +13,8 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
+			"nvim-telescope/telescope.nvim",
+
 			{ "mason-org/mason.nvim", opts = {} },
 			"mason-org/mason-lspconfig.nvim",
 			"WhoIsSethDaniel/mason-tool-installer.nvim",
@@ -32,16 +34,16 @@ return {
 					end
 					local telescope = require("telescope.builtin")
 
-					map("n", "grn", vim.lsp.buf.rename, "[R]e[n]ame")
-					map({ "n", "x" }, "gra", vim.lsp.buf.code_action, "[G]oto Code [A]ction")
-					map("n", "grr", telescope.lsp_references, "[G]oto [R]eferences")
-					map("n", "gri", telescope.lsp_implementations, "[G]oto [I]mplementation")
-					map("n", "grd", telescope.lsp_definitions, "[G]oto [D]definition")
-					map("n", "grD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-					map("n", "gs", telescope.lsp_document_symbols, "Open Document Symbols")
-					map("n", "gW", telescope.lsp_dynamic_workspace_symbols, "Open Workspace Symbols")
-					map("n", "grt", telescope.lsp_type_definitions, "[G]oto [T]ype Definition")
-					map("n", "grs", vim.lsp.buf.signature_help, "Display [S]ignature help")
+					map("n", "gR", vim.lsp.buf.rename, "[R]ename")
+					map({ "n", "x" }, "gca", vim.lsp.buf.code_action, "[G]oto [C]ode [A]ction")
+					map("n", "gr", telescope.lsp_references, "[G]oto [R]eferences")
+					map("n", "gi", telescope.lsp_implementations, "[G]oto [I]mplementation")
+					map("n", "gd", telescope.lsp_definitions, "[G]oto [D]definition")
+					map("n", "gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
+					map("n", "gt", telescope.lsp_type_definitions, "[G]oto [T]ype Definition")
+
+					map("n", "gs", vim.lsp.buf.signature_help, "Display [S]ignature help")
+					map("i", "<C-s>", vim.lsp.buf.signature_help, "Display [S]ignature help")
 
 					-- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
 					---@param client vim.lsp.Client
@@ -97,7 +99,7 @@ return {
 					then
 						map("n", "<leader>h", function()
 							vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled({ bufnr = event.buf }))
-						end, "[T]oggle Inlay [H]ints")
+						end, "Toggle Inlay [H]ints")
 					end
 				end,
 			})
@@ -107,14 +109,14 @@ return {
 				severity_sort = true,
 				float = { border = "rounded", source = "if_many" },
 				underline = { severity = vim.diagnostic.severity.ERROR },
-				signs = vim.g.have_nerd_font and {
+				signs = {
 					text = {
 						[vim.diagnostic.severity.ERROR] = "󰅚 ",
 						[vim.diagnostic.severity.WARN] = "󰀪 ",
 						[vim.diagnostic.severity.INFO] = "󰋽 ",
 						[vim.diagnostic.severity.HINT] = "󰌶 ",
 					},
-				} or {},
+				},
 				virtual_text = {
 					source = "if_many",
 					spacing = 2,
