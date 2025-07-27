@@ -25,6 +25,16 @@ return {
 				},
 			},
 			opts = {},
+			config = function()
+				local ls = require("luasnip")
+				ls.add_snippets("go", {
+					ls.snippet("iferrnil", {
+						ls.text_node({ "if err != nil {", "\t" }),
+						ls.insert_node(1, "return err"),
+						ls.text_node({ "", "}" }),
+					}),
+				})
+			end,
 		},
 		"folke/lazydev.nvim",
 	},
