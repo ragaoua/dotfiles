@@ -26,6 +26,22 @@ return {
 			"saghen/blink.cmp",
 		},
 		config = function()
+			-- Make sure that small pop up windows have a border
+			local hover = vim.lsp.buf.hover
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.lsp.buf.hover = function()
+				return hover({
+					border = "rounded",
+				})
+			end
+			local signature_help = vim.lsp.buf.signature_help
+			---@diagnostic disable-next-line: duplicate-set-field
+			vim.lsp.buf.signature_help = function()
+				return signature_help({
+					border = "rounded",
+				})
+			end
+
 			vim.api.nvim_create_autocmd("LspAttach", {
 				group = vim.api.nvim_create_augroup("lsp-attach", { clear = true }),
 				callback = function(event)
@@ -34,16 +50,15 @@ return {
 					end
 					local telescope = require("telescope.builtin")
 
-					map("n", "gR", vim.lsp.buf.rename, "[R]ename")
-					map({ "n", "x" }, "gca", vim.lsp.buf.code_action, "[G]oto [C]ode [A]ction")
-					map("n", "gr", telescope.lsp_references, "[G]oto [R]eferences")
-					map("n", "gi", telescope.lsp_implementations, "[G]oto [I]mplementation")
-					map("n", "gd", telescope.lsp_definitions, "[G]oto [D]definition")
-					map("n", "gD", vim.lsp.buf.declaration, "[G]oto [D]eclaration")
-					map("n", "gt", telescope.lsp_type_definitions, "[G]oto [T]ype Definition")
+					-- Add "goto" keymaps to default ones
+					map("n", "grd", telescope.lsp_definitions, "[G]oto [R]eference [D]definition")
+					map("n", "grD", vim.lsp.buf.declaration, "[G]oto [R]eference [D]eclaration")
+					map("n", "grt", telescope.lsp_type_definitions, "[G]oto [R]eference [T]ype Definition")
 
-					map("n", "gs", vim.lsp.buf.signature_help, "Display [S]ignature help")
-					map("i", "<C-s>", vim.lsp.buf.signature_help, "Display [S]ignature help")
+					-- Hijack existing "goto" keymaps by telescope
+					-- Telescope is great for there because it provides previews
+					map("n", "grr", telescope.lsp_references, "[G]oto [R]eference [R]eferences")
+					map("n", "gri", telescope.lsp_implementations, "[G]oto [R]eference [I]mplementation")
 
 					-- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
 					---@param client vim.lsp.Client
@@ -92,7 +107,6 @@ return {
 					end
 
 					-- Create a keymap to toggle inlay hints in the code, if the language server supports them
-					-- This may be unwanted, since they displace some of your code
 					if
 						client
 						and client_supports_method(client, vim.lsp.protocol.Methods.textDocument_inlayHint, event.buf)
