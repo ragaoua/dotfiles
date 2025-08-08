@@ -13,7 +13,7 @@ vim.keymap.set("i", "jk", "<ESC>", { desc = "jk to escape insert mode" })
 vim.keymap.set("i", "kj", "<ESC>", { desc = "kj to escape insert mode" })
 
 -- Searching
-vim.keymap.set("n", "<leader>c", ":nohlsearch<CR>", { desc = "Clear search highlights" })
+vim.keymap.set("n", "<Esc>", ":nohlsearch<CR>", { desc = "Clear search highlights" })
 
 -- Center screen when jumping
 -- vim.keymap.set("n", "n", "nzzzv", { desc = "Next search result (centered)" })
