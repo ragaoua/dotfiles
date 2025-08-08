@@ -67,4 +67,3 @@ vim.keymap.set("v", "c", "gc", { desc = "Toggle Comment Selection", remap = true
 
 -- Others
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
-vim.keymap.set("n", "<leader>rc", ":e ~/.config/nvim/init.lua<CR>", { desc = "Edit config" })
