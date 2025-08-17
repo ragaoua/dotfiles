@@ -19,8 +19,7 @@ return {
 				-- Disable "format_on_save lsp_fallback" for languages that don't
 				-- have a well standardized coding style for example.
 				local disable_filetypes = {
-					-- c = true,
-					-- cpp = true
+          typst = true
 				}
 				if disable_filetypes[vim.bo[bufnr].filetype] then
 					return nil
