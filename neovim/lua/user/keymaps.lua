@@ -32,10 +32,10 @@ vim.keymap.set("n", "<leader>bp", ":bprevious<CR>", { desc = "Previous buffer" }
 vim.keymap.set("n", "<leader>bd", ":bdelete<CR>", { desc = "Previous buffer" })
 
 -- Window navigation
--- vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
--- vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
--- vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
--- vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left window" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to bottom window" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to top window" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right window" })
 
 -- Splitting & Resizing
 vim.keymap.set("n", "<C-s>v", ":vsplit<CR>", { desc = "Split window vertically" })
@@ -46,8 +46,6 @@ vim.keymap.set("n", "<C-Left>", ":vertical resize -2<CR>", { desc = "Decrease wi
 vim.keymap.set("n", "<C-Right>", ":vertical resize +2<CR>", { desc = "Increase window width" })
 
 -- Move lines up/down
-vim.keymap.set("n", "<C-j>", ":m .+1<CR>==", { desc = "Move line down" })
-vim.keymap.set("n", "<C-k>", ":m .-2<CR>==", { desc = "Move line up" })
 vim.keymap.set("v", "<C-j>", ":m '>+1<CR>gv=gv", { desc = "Move selection down" })
 vim.keymap.set("v", "<C-k>", ":m '<-2<CR>gv=gv", { desc = "Move selection up" })
 
