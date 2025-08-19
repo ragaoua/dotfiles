@@ -1,7 +1,3 @@
-Remap the right Command key to the right Ctrl key (done via https://hidutil-generator.netlify.app/) :
-
-~~~bash
-cat >~/Library/LaunchAgents/com.local.KeyRemapping.plist <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
@@ -13,6 +9,8 @@ cat >~/Library/LaunchAgents/com.local.KeyRemapping.plist <<EOF
         <string>/usr/bin/hidutil</string>
         <string>property</string>
         <string>--set</string>
+        <!-- Remap the right `Command` key to the right `Ctrl` key
+        (done via https://hidutil-generator.netlify.app/) -->
         <string>{"UserKeyMapping":[
             {
               "HIDKeyboardModifierMappingSrc": 0x7000000E7,
@@ -24,7 +22,3 @@ cat >~/Library/LaunchAgents/com.local.KeyRemapping.plist <<EOF
     <true/>
 </dict>
 </plist>
-EOF
-
-launchctl load ~/Library/LaunchAgents/com.local.KeyRemapping.plist
-~~~
