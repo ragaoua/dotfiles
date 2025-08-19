@@ -1,14 +1,10 @@
 # Configuration
 
-```bash
-stow dotfiles
-```
-
 # Ghostty configuration
 
 ```bash
 cd dotfiles
-stow ghostty
+stow -t "$HOME" ghostty
 ```
 
 Then reload the Ghostty config (cmd+shift+,)
@@ -38,7 +34,7 @@ Install this config :
 
 ~~~bash
 cd dotfiles
-stow nvim
+stow -t "$HOME" nvim
 ~~~
 
 Install dependencies :
@@ -60,7 +56,7 @@ EOF
 
 ```bash
 cd dotfiles
-stow tmux
+stow -t "$HOME" tmux
 ```
 
 When running `tmux` for the first time after that, the config will try
@@ -71,16 +67,15 @@ the first execution of tmux might take a while.
 
 ~~~bash
 cd dotfiles
-stow git
+stow -t "$HOME" git
 git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
 ~~~
 
 # profile.d configuration
 
 ```bash
-find profile.d -type f | while read -r file ; do
-    sudo ln -sf "$(realpath "$file")" /etc/profile.d/
-done
+cd dotfiles
+sudo stow -t /etc/profile.d profile.d
 ```
 
 # PS1 configuration
@@ -90,6 +85,7 @@ Just add `bash/PS1.sh`'s content somewhere in the /etc/bashrc file.
 # Keyboard configuration
 
 ~~~bash
-ln -s com.local.KeyRemapping.plist ${HOME}/Library/LaunchAgents/com.local.KeyRemapping.plist
-launchctl load ~/Library/LaunchAgents/com.local.KeyRemapping.plist
+cd dotfiles
+sudo stow -t "${HOME}/Library/LaunchAgents" keyboard
+launchctl load "${HOME}/Library/LaunchAgents/$(ls keyboard)"
 ~~~
