@@ -1,7 +1,6 @@
 # Ghostty configuration
 
 ```bash
-cd dotfiles
 stow -t "$HOME" ghostty
 ```
 
@@ -31,7 +30,6 @@ mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
 Install this config :
 
 ~~~bash
-cd dotfiles
 stow -t "$HOME" nvim
 ~~~
 
@@ -53,7 +51,6 @@ EOF
 # Tmux configuration
 
 ```bash
-cd dotfiles
 stow -t "$HOME" tmux
 ```
 
@@ -64,7 +61,6 @@ the first execution of tmux might take a while.
 # Git configuration
 
 ~~~bash
-cd dotfiles
 stow -t "$HOME" git
 git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
 ~~~
@@ -72,18 +68,16 @@ git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
 # profile.d configuration
 
 ```bash
-cd dotfiles
 sudo stow -t /etc/profile.d profile.d
 ```
 
 # PS1 configuration
 
-Just add `bash/PS1.sh`'s content somewhere in the /etc/bashrc file.
+Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 
 # Keyboard configuration
 
 ~~~bash
-cd dotfiles
 sudo stow -t "${HOME}/Library/LaunchAgents" keyboard
 launchctl load "${HOME}/Library/LaunchAgents/$(ls keyboard)"
 ~~~
