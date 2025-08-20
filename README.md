@@ -48,6 +48,12 @@ alias vi=nvim
 EOF
 ```
 
+# Scripts set up
+
+```bash
+stow -t "/usr/local/bin/" scripts
+```
+
 # Tmux configuration
 
 ```bash
@@ -57,6 +63,9 @@ stow -t "$HOME" tmux
 When running `tmux` for the first time after that, the config will try
 and bootstrap `tpm` by cloning it then installing all plugins configured. So,
 the first execution of tmux might take a while.
+
+The tmux config may include binding to execute scripts installed in `$HOME/.config/scripts`.
+So make sure these are set up correctly.
 
 # Git configuration
 
@@ -71,13 +80,13 @@ git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
 sudo stow -t /etc/profile.d profile.d
 ```
 
-# PS1 configuration
-
-Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
-
 # Keyboard configuration
 
 ~~~bash
 sudo stow -t "${HOME}/Library/LaunchAgents" keyboard
 launchctl load "${HOME}/Library/LaunchAgents/$(ls keyboard)"
 ~~~
+
+# PS1 configuration
+
+Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
