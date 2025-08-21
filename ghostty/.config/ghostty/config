@@ -1,3 +1,4 @@
 theme = catppuccin-macchiato
 background-opacity = 0.8
 background-blur = 20
+command = /bin/bash -l -c "tmux new-session -A -s root"
