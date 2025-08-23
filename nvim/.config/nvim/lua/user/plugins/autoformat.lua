@@ -16,19 +16,20 @@ return {
 		opts = {
 			notify_on_error = true,
 			format_on_save = function(bufnr)
-				-- Disable "format_on_save lsp_fallback" for languages that don't
-				-- have a well standardized coding style for example.
+				-- Cases where format_on_save should be disabled
 				local disable_filetypes = {
-          typst = true
+					typst = true,
 				}
-				if disable_filetypes[vim.bo[bufnr].filetype] then
+				local is_fugitive_bfr = vim.api.nvim_buf_get_name(bufnr):match("^fugitive://")
+
+				if disable_filetypes[vim.bo[bufnr].filetype] or is_fugitive_bfr then
 					return nil
-				else
-					return {
-						timeout_ms = 500,
-						lsp_format = "fallback",
-					}
 				end
+
+				return {
+					timeout_ms = 500,
+					lsp_format = "fallback",
+				}
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
