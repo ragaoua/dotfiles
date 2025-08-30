@@ -87,6 +87,12 @@ sudo stow -t "${HOME}/Library/LaunchAgents" keyboard
 launchctl load "${HOME}/Library/LaunchAgents/$(ls keyboard)"
 ~~~
 
-# PS1 configuration
+# PS1
 
 Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
+
+# .inputrc
+
+```bash
+stow -t "$HOME" inputrc
+```
