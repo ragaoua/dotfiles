@@ -1,9 +1,3 @@
--- keymapping (soft) rules :
--- - <leader> is generally used for navigating between files/buffers
--- - <Ctrl>+key is used as a "secondary leader" to access keymaps for a specific "feature"
---   (e.g, <C-w> to then be able to move between windows with h, j, k and l)
--- - Otherwise, <Ctrl> is used for navigating inside a file
-
 -- Leader key
 vim.g.mapleader = " " -- Set leader key to space
 vim.g.maplocalleader = " " -- Set local leader key (NEW)
@@ -65,3 +59,4 @@ vim.keymap.set("v", "c", "gc", { desc = "Toggle Comment Selection", remap = true
 
 -- Others
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
+vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics under the cursor" })
