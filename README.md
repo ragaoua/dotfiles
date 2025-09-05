@@ -51,7 +51,13 @@ EOF
 # Scripts set up
 
 ```bash
-stow -t "/usr/local/bin/" scripts
+sudo stow -t "/usr/local/bin/" scripts
+```
+
+Install dependencies :
+
+```bash
+brew install fzf fd
 ```
 
 # Tmux configuration
