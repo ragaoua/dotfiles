@@ -30,7 +30,7 @@ mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
 Install this config :
 
 ~~~bash
-stow -t "$HOME" nvim
+make nvim
 ~~~
 
 Install dependencies :
@@ -51,7 +51,7 @@ EOF
 # Scripts set up
 
 ```bash
-sudo stow -t "/usr/local/bin/" scripts
+make scripts
 ```
 
 Install dependencies :
@@ -63,7 +63,7 @@ brew install fzf fd
 # Tmux configuration
 
 ```bash
-stow -t "$HOME" tmux
+make tmux
 ```
 
 When running `tmux` for the first time after that, the config will try
@@ -76,21 +76,19 @@ So make sure these are set up correctly.
 # Git configuration
 
 ~~~bash
-stow -t "$HOME" git
-git config --global core.excludesFile "${HOME}/.config/git/.gitignore"
+make git
 ~~~
 
 # profile.d configuration
 
 ```bash
-sudo stow -t /etc/profile.d profile.d
+make profile
 ```
 
 # Keyboard configuration
 
 ~~~bash
-sudo stow -t "${HOME}/Library/LaunchAgents" keyboard
-launchctl load "${HOME}/Library/LaunchAgents/$(ls keyboard)"
+make keyboard
 ~~~
 
 # PS1
@@ -100,5 +98,5 @@ Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 # .inputrc
 
 ```bash
-stow -t "$HOME" inputrc
+make inputrc
 ```
