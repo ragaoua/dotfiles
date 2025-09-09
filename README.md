@@ -1,12 +1,18 @@
-# Ghostty configuration
+# dotfiles
+
+## Prerequisites
+
+Install make, stow
+
+## Ghostty configuration
 
 ```bash
-stow -t "$HOME" ghostty
+make ghostty
 ```
 
 Then reload the Ghostty config (cmd+shift+,)
 
-# Neovim configuration
+## Neovim configuration
 
 This config has been heavily inspired by the [kickstart project](https://github.com/nvim-lua/kickstart.nvim), but it
 isn't a fork per say. I wanted to write the config myself and make sure I understand (almost) every piece of code / config
@@ -16,7 +22,7 @@ gonna be using.
 The kickstart config commit : 3338d39. If anything breaks in the future (maybe due to a neovim update or a plugin update),
 take a look at the kickstart github and see if maybe they addressed it.
 
-## Installation
+### Installation
 
 (Eventually) backup the current config :
 
@@ -40,7 +46,7 @@ Install dependencies :
 brew install ripgrep
 ~~~
 
-## Alias vi to nvim
+### Alias vi to nvim
 
 ```bash
 cat >/etc/profile.d/vi.sh <<EOF
@@ -48,7 +54,7 @@ alias vi=nvim
 EOF
 ```
 
-# Scripts set up
+## Scripts set up
 
 ```bash
 make scripts
@@ -60,7 +66,7 @@ Install dependencies :
 brew install fzf fd
 ```
 
-# Tmux configuration
+## Tmux configuration
 
 ```bash
 make tmux
@@ -73,29 +79,29 @@ the first execution of tmux might take a while.
 The tmux config may include binding to execute scripts installed in `$HOME/.config/scripts`.
 So make sure these are set up correctly.
 
-# Git configuration
+## Git configuration
 
 ~~~bash
 make git
 ~~~
 
-# profile.d configuration
+## profile.d configuration
 
 ```bash
 make profile
 ```
 
-# Keyboard configuration
+## Keyboard configuration
 
 ~~~bash
 make keyboard
 ~~~
 
-# PS1
+## PS1
 
 Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 
-# .inputrc
+## .inputrc
 
 ```bash
 make inputrc
