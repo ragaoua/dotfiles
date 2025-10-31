@@ -1,1 +1,1 @@
-LESS="SFR"
+export LESS="SFR"
