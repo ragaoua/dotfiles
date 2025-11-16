@@ -36,8 +36,7 @@ profile:
 
 .PHONY: keyboard
 keyboard:
-	sudo stow -t "$(HOME)/Library/LaunchAgents" keyboard
-	launchctl load "$(HOME)/Library/LaunchAgents/$$(ls keyboard)"
+	sudo stow -t "$(HOME)/.config/karabiner" keyboard
 	@echo "✅ Keyboard config installed"
 
 .PHONY: inputrc
