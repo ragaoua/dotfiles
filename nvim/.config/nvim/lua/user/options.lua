@@ -3,8 +3,8 @@ vim.opt.number = true -- Line numbers
 vim.opt.relativenumber = true -- Relative line numbers
 vim.opt.cursorline = true -- Highlight current line
 vim.opt.wrap = false -- Don't wrap lines
-vim.opt.scrolloff = 10 -- Keep n lines above/below cursor
-vim.opt.sidescrolloff = 20 -- Keep n columns left/right of cursor
+vim.opt.scrolloff = 5 -- Keep n lines above/below cursor
+vim.opt.sidescrolloff = 10 -- Keep n columns left/right of cursor
 
 -- Indentation
 vim.opt.tabstop = 2 -- Tab width
