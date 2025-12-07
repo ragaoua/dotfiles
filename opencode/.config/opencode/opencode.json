@@ -1,11 +1,4 @@
 {
   "$schema": "https://opencode.ai/config.json",
   "theme": "catppuccin",
-  "command": {
-    "review": {
-      "template": "Review the current git diff and provide:\n1. **Summary**: What changed? (affected modules/layers, functional vs technical changes, overall intent)\n2. **Critical Issues** (if any):\n   - Bugs, security vulnerabilities, or breaking changes\n   - Logic errors or edge cases not handled\n3. **Architecture & Design**:\n   - Changes that don't align with the codebase patterns\n   - Better approaches or refactoring opportunities\n   - Performance/algorithmic improvements\n4. **Code Quality**:\n   - Clarity/readability improvements\n   - Type safety or validation gaps\n   - Error handling issues\n5. **Housekeeping**:\n   - TODOs, commented code, or debug statements\n   - Missing tests or documentation\n   - Anything that seems out of place\n6. **Commit Message**: Suggest 1-2 concise commit messages following this project's conventions\nFocus on the top 3-5 most impactful suggestions. Include code examples for non-obvious recommendations.",
-      "description": "Do a full review of the code changes",
-      "agent": "build",
-    },
-  },
 }
