@@ -43,3 +43,8 @@ keyboard:
 inputrc:
 	stow -t "$(HOME)" inputrc
 	@echo "✅ .inputrc installed"
+
+.PHONY: opencode
+opencode:
+	stow -t "$(HOME)" opencode
+	@echo "✅ opencode config installed"

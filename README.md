@@ -26,25 +26,25 @@ take a look at the kickstart github and see if maybe they addressed it.
 
 (Eventually) backup the current config :
 
-~~~bash
+```bash
 mv ${HOME}/.config/nvim ${HOME}/.config/nvim.bak
 mv ${HOME}/.local/share/nvim ${HOME}/.local/share/nvim.bak
 mv ${HOME}/.local/state/nvim ${HOME}/.local/state/nvim.bak
 mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
-~~~
+```
 
 Install this config :
 
-~~~bash
+```bash
 make nvim
-~~~
+```
 
 Install dependencies :
 
-~~~bash
+```bash
 # ripgrep is required for telescopes's grepping features
 brew install ripgrep
-~~~
+```
 
 ### Alias vi to nvim
 
@@ -81,9 +81,9 @@ So make sure these are set up correctly.
 
 ## Git configuration
 
-~~~bash
+```bash
 make git
-~~~
+```
 
 ## profile.d configuration
 
@@ -93,9 +93,9 @@ make profile
 
 ## Keyboard configuration
 
-~~~bash
+```bash
 make keyboard
-~~~
+```
 
 ## PS1
 
@@ -105,4 +105,21 @@ Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 
 ```bash
 make inputrc
+```
+
+## Opencode
+
+(Eventually) backup the current config :
+
+```bash
+mv ${HOME}/.config/opencode ${HOME}/.config/opencode.bak
+mv ${HOME}/.local/share/opencode ${HOME}/.local/share/opencode.bak
+mv ${HOME}/.local/state/opencode ${HOME}/.local/state/opencode.bak
+mv ${HOME}/.cache/opencode ${HOME}/.cache/opencode.bak
+```
+
+Install this config :
+
+```bash
+make opencode
 ```
