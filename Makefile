@@ -23,12 +23,6 @@ tmux:
 	stow -t "$(HOME)" tmux
 	@echo "✅ Tmux config installed"
 
-.PHONY: git
-git:
-	stow -t "$(HOME)" git
-	git config --global core.excludesFile "$(HOME)/.config/git/.gitignore"
-	@echo "✅ Git config installed"
-
 .PHONY: profile
 profile:
 	sudo stow -t /etc/profile.d profile.d
