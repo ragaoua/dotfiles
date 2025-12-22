@@ -1,10 +1,32 @@
 # dotfiles
 
-## Prerequisites
+## Global prerequisites
 
 Install make, stow
 
+## Scripts set up
+
+```bash
+brew install fzf fd
+make scripts
+```
+
+## Tmux configuration
+
+Prerequisites : tmux-related scripts installed in `/usr/local/bin`.
+
+```bash
+brew install tmux
+make tmux
+```
+
+When running `tmux` for the first time after that, the config will try
+and bootstrap `tpm` by cloning it then installing all plugins configured. So,
+the first execution of tmux might take a while.
+
 ## Ghostty configuration
+
+Prerequisite : install tmux
 
 ```bash
 make ghostty
@@ -44,45 +66,6 @@ Install dependencies :
 ```bash
 # ripgrep is required for telescopes's grepping features
 brew install ripgrep
-```
-
-### Alias vi to nvim
-
-```bash
-cat >/etc/profile.d/vi.sh <<EOF
-alias vi=nvim
-EOF
-```
-
-## Scripts set up
-
-```bash
-make scripts
-```
-
-Install dependencies :
-
-```bash
-brew install fzf fd
-```
-
-## Tmux configuration
-
-```bash
-make tmux
-```
-
-When running `tmux` for the first time after that, the config will try
-and bootstrap `tpm` by cloning it then installing all plugins configured. So,
-the first execution of tmux might take a while.
-
-The tmux config may include binding to execute scripts installed in `$HOME/.config/scripts`.
-So make sure these are set up correctly.
-
-## Git configuration
-
-```bash
-make git
 ```
 
 ## profile.d configuration
