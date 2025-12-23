@@ -2,3 +2,5 @@ set completion-ignore-case on
 
 "\C-p": history-search-backward
 "\C-n": history-search-forward
+"\C-f": forward-word
+"\C-b": backward-word
