@@ -70,7 +70,7 @@
         -1,
         -1,
         -1,
-        "KC_LCTRL",
+        "TD(0)",
         "FN_MO13",
         "KC_SPACE",
         -1
@@ -154,27 +154,27 @@
       [
         "KC_TRNS",
         "KC_NO",
-        "KC_NO",
-        "KC_NO",
-        "KC_NO",
+        "KC_KP_7",
+        "KC_KP_8",
+        "KC_KP_9",
         "KC_BRIU",
         "KC_F9"
       ],
       [
         "KC_TRNS",
         "KC_NO",
-        "KC_NO",
-        "KC_NO",
-        "KC_NO",
+        "KC_KP_4",
+        "KC_KP_5",
+        "KC_KP_6",
         "KC_BRID",
         "KC_F10"
       ],
       [
         "KC_TRNS",
         "KC_NO",
-        "KC_NO",
-        "KC_NO",
-        "KC_NO",
+        "KC_KP_1",
+        "KC_KP_2",
+        "KC_KP_3",
         "RGB_TOG",
         -1
       ],
@@ -559,7 +559,20 @@
   ],
   "layout_options": 0,
   "macro": [
-    [],
+    [
+      [
+        "down",
+        "KC_LGUI"
+      ],
+      [
+        "tap",
+        "KC_M"
+      ],
+      [
+        "up",
+        "KC_LGUI"
+      ]
+    ],
     [],
     [],
     [],
@@ -580,8 +593,8 @@
   "via_protocol": 9,
   "tap_dance": [
     [
-      "KC_NO",
-      "KC_NO",
+      "M0",
+      "KC_LCTRL",
       "KC_NO",
       "KC_NO",
       200
@@ -806,18 +819,18 @@
   ],
   "combo": [
     [
-      "KC_ESCAPE",
-      "KC_LGUI",
-      "KC_NO",
-      "KC_NO",
-      "TG(2)"
-    ],
-    [
       "KC_LSHIFT",
       "KC_RSHIFT",
       "KC_NO",
       "KC_NO",
       "KC_CAPSLOCK"
+    ],
+    [
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO",
+      "KC_NO"
     ],
     [
       "KC_NO",
