@@ -70,7 +70,7 @@
         -1,
         -1,
         -1,
-        "TD(0)",
+        "KC_LCTRL",
         "FN_MO13",
         "KC_SPACE",
         -1
@@ -559,20 +559,7 @@
   ],
   "layout_options": 0,
   "macro": [
-    [
-      [
-        "down",
-        "KC_LGUI"
-      ],
-      [
-        "tap",
-        "KC_M"
-      ],
-      [
-        "up",
-        "KC_LGUI"
-      ]
-    ],
+    [],
     [],
     [],
     [],
@@ -593,8 +580,8 @@
   "via_protocol": 9,
   "tap_dance": [
     [
-      "M0",
-      "KC_LCTRL",
+      "KC_NO",
+      "KC_NO",
       "KC_NO",
       "KC_NO",
       200
