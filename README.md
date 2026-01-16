@@ -90,6 +90,8 @@ Just add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 make inputrc
 ```
 
+Then add `stty werase undef` to `/etc/bashrc`.
+
 ## Opencode
 
 (Eventually) backup the current config :
