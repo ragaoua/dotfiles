@@ -4,3 +4,4 @@ set completion-ignore-case on
 "\C-n": history-search-forward
 "\C-f": forward-word
 "\C-b": backward-word
+"\C-w": backward-kill-word
