@@ -1,5 +1,6 @@
 #!/bin/bash
 # shellcheck disable=SC2155
+set -euo pipefail
 
 slugify() {
   while IFS= read -r string; do
