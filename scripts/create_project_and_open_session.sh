@@ -11,8 +11,9 @@ if [ -z "${project_name}" ]; then
   read -r -p "Project directory name: " project_name
 fi
 
-if [ -z "${project_name}" ]; then
-  exit 0
+if [ -z "${project_name}" ] || [[ ! "${project_name}" =~ ^[A-Za-z0-9_-]+$ ]]; then
+  echo >&2 "Invalid project name: '${project_name}'. Use only letters, numbers, dashes, and underscores."
+  exit 1
 fi
 readonly project_name
 
