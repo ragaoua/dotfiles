@@ -1,5 +1,5 @@
 #!/bin/bash
-# Open (or switch to) an "nvim" tmux window at index 2.
+# Opens or moves a tmux window to the target index, then selects it.
 
 # shellcheck disable=SC2155
 
@@ -10,9 +10,9 @@ if [ -z "${TMUX:-}" ] ; then
   exit 1
 fi
 
-readonly window_name="nvim"
-readonly window_target_index=2
-readonly window_shell_command="nvim ."
+readonly window_target_index="$1"
+readonly window_name="$2"
+readonly window_shell_command="${3:-}"
 readonly window_initial_index="$(
   tmux list-windows -F "#{window_index} #{window_name}" |
     awk -v name="$window_name" '$2 == name {print $1}'
@@ -29,33 +29,38 @@ readonly last_window_index="$(
   )"
 
 if [ -z "$window_initial_index" ] ; then
-  # Window doesn't exist > right-shift every window from index $window_target_index
-  # upward by one in descending order, then create the window at the right index
+  # Window doesn't exist > right-shift every window from the last index down to
+  # index $window_target_index, then create the window at the right index
   if [ -n "$last_window_index" ] && [ "$last_window_index" -ge "$window_target_index" ] ; then
     for index in $(seq "$last_window_index" -1 "$window_target_index") ; do
       tmux move-window -s "${index}" -t "$((index + 1))"
     done
   fi
 
-  tmux new-window -t "${window_target_index}" -n "$window_name" "$window_shell_command"
+  # shellcheck disable=SC2086
+  tmux new-window -t "${window_target_index}" -n "$window_name" $window_shell_command
 else
   if [ -n "$last_window_index" ] && [ "$last_window_index" -le "$window_target_index" ] ; then
     # Window exists and its target index isn't is use > move it there
     tmux move-window -s "$window_initial_index" -t "$window_target_index"
   else
-    # Window exists but its index is occupied by another one > move it at the end,
-    # then:
+    # Window exists but its index is (potentially) occupied by another one >
+    # move it at the end, then:
     # - If it's located after its target index, right-shift every window from index
-    #   $window_current_index down to $window_target_index by one
+    #   $window_initial_index down to $window_target_index by one
     # - If it's located before its target index, left-shift every window from index
-    #   $window_current_index+1 up to $window_target_index by one
+    #   $window_initial_index+1 up to $window_target_index by one
     # then move the window again, into its target index
     readonly window_tmp_index="$((last_window_index + 1))"
     tmux move-window -s "${window_initial_index}" -t "$window_tmp_index"
 
     if [ "$window_initial_index" -gt "$window_target_index" ] ; then
       for index in $(seq "$((window_initial_index - 1))" -1 "$window_target_index") ; do
-        tmux move-window -s "${index}" -t "$((index + 1))"
+        # NOTE: '|| true' is here to stop an error from halting the script.
+        # It can happen when there is a gap in the numbering of windows,
+        # causing the move-window command to fail because of the absence
+        # of some windows in the sequence
+        tmux move-window -s "${index}" -t "$((index + 1))" || true
       done
     else
       for index in $(seq "$((window_initial_index + 1))" 1 "$window_target_index") ; do
