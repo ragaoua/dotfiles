@@ -56,8 +56,13 @@ if [ -e "${project_path}" ] && [ -n "$(ls -A "${project_path}" 2>/dev/null)" ]; 
 fi
 
 if [ -n "${repo_slug}" ]; then
-  readonly repo_url="git@github.com:${repo_slug}.git"
-  tmux display-popup -E -T "Cloning ${repo_slug}" "git clone \"${repo_url}\" \"${project_path}\""
+  git_clone_command="gh repo clone ${repo_slug} \"${project_path}\""
+
+  if [ -z "${TMUX:-}" ] ; then
+    $git_clone_command
+  else
+    tmux display-popup -E -T "Cloning ${repo_slug}" "$git_clone_command"
+  fi
 else
   mkdir -p "${project_path}"
 fi
