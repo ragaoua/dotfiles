@@ -37,8 +37,9 @@ if [ -z "$window_initial_index" ] ; then
     done
   fi
 
+  readonly path="$(tmux display-message -p '#{pane_current_path}')"
   # shellcheck disable=SC2086
-  tmux new-window -t "${window_target_index}" -n "$window_name" $window_shell_command
+  tmux new-window -t "${window_target_index}" -c "$path" -n "$window_name" $window_shell_command
 else
   if [ -n "$last_window_index" ] && [ "$last_window_index" -le "$window_target_index" ] ; then
     # Window exists and its target index isn't is use > move it there
