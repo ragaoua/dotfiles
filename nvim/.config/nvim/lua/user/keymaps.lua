@@ -58,6 +58,23 @@ vim.keymap.set("n", "<leader><leader>", ":find ", { desc = "Find file" })
 vim.keymap.set("n", "cc", "gcc", { desc = "Toggle Comment Line", remap = true })
 vim.keymap.set("v", "c", "gc", { desc = "Toggle Comment Selection", remap = true })
 
+-- Diagnostics and quickfix list
+vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics under the cursor" })
+vim.keymap.set("n", "<leader>D", vim.diagnostic.setqflist, { desc = "Add all diagnostics to the quickfix list" })
+vim.keymap.set("n", "<leader>q", function()
+	local qf = vim.fn.getwininfo()
+	local open = false
+	for _, w in ipairs(qf) do
+		if w.quickfix == 1 then
+			open = true
+		end
+	end
+	if open then
+		vim.cmd("cclose")
+	else
+		vim.cmd("copen")
+	end
+end, { noremap = true, silent = true, desc = "Toggle quickfix list" })
+
 -- Others
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
-vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics under the cursor" })
