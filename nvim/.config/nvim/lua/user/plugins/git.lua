@@ -23,7 +23,7 @@ return {
 						return
 					end
 				end
-				vim.cmd("G")
+				vim.cmd("vert Git")
 			end
 
 			vim.keymap.set("n", "<leader>g", fugitive_toggle, { desc = "Toggle Git Fugitive" })
