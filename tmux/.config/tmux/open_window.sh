@@ -29,11 +29,16 @@ readonly last_window_index="$(
   )"
 
 if [ -z "$window_initial_index" ] ; then
-  # Window doesn't exist > right-shift every window from the last index down to
-  # index $window_target_index, then create the window at the right index
+  # Window doesn't exist and its index may be occupied by another one >
+  # right-shift every window from the last index down to index
+  # $window_target_index, then create the window at the right index
   if [ -n "$last_window_index" ] && [ "$last_window_index" -ge "$window_target_index" ] ; then
+    # NOTE: '|| true' is here to stop an error from halting the script.
+    # It can happen when there is a gap in the numbering of windows,
+    # causing the move-window command to fail because of the absence
+    # of a window in the sequence
     for index in $(seq "$last_window_index" -1 "$window_target_index") ; do
-      tmux move-window -s "${index}" -t "$((index + 1))"
+      tmux move-window -s "${index}" -t "$((index + 1))" || true
     done
   fi
 
@@ -45,7 +50,7 @@ else
     # Window exists and its target index isn't is use > move it there
     tmux move-window -s "$window_initial_index" -t "$window_target_index"
   else
-    # Window exists but its index is (potentially) occupied by another one >
+    # Window exists but its index may be occupied by another one >
     # move it at the end, then:
     # - If it's located after its target index, right-shift every window from index
     #   $window_initial_index down to $window_target_index by one
@@ -60,7 +65,7 @@ else
         # NOTE: '|| true' is here to stop an error from halting the script.
         # It can happen when there is a gap in the numbering of windows,
         # causing the move-window command to fail because of the absence
-        # of some windows in the sequence
+        # of a window in the sequence
         tmux move-window -s "${index}" -t "$((index + 1))" || true
       done
     else
