@@ -149,7 +149,8 @@ return {
 			local capabilities = require("blink.cmp").get_lsp_capabilities()
 
 			local servers = {
-				gopls = {},
+				-- Lua
+				stylua = {},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -161,11 +162,24 @@ return {
 						},
 					},
 				},
+				-- Typescript
+				prettierd = {},
+				oxlint = {},
+				ts_ls = {},
+				tsgo = {},
+				-- Python
+				basedpyright = {},
+				ruff = {},
+				-- Java
+				jdtls = {},
+				-- Yaml
+				yamlls = {},
 			}
-
 			local ensure_installed = vim.tbl_keys(servers or {})
 			vim.list_extend(ensure_installed, {
-				"stylua", -- Used to format Lua code
+				-- Java
+				"java-debug-adapter",
+				"google-java-format",
 			})
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
