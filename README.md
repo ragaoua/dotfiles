@@ -56,7 +56,7 @@ take a look at the kickstart github and see if maybe they addressed it.
 
 ### Installation
 
-Prerequisite: install ripgrep (telescope dependency).
+Prerequisite: install ripgrep (telescope dependency) and npm (to install Mason packages).
 
 (Eventually) backup the current config :
 
