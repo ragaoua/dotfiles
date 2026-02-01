@@ -6,6 +6,8 @@ Install make, stow
 
 ## Scripts set up
 
+Prerequiite: install fzf and fd (fd-find)
+
 ```bash
 brew install fzf fd
 make scripts
@@ -13,10 +15,9 @@ make scripts
 
 ## Tmux configuration
 
-Prerequisites : tmux-related scripts installed in `/usr/local/bin`.
+Prerequisite: install tmux and the tmux-related scripts installed in `/usr/local/bin`.
 
 ```bash
-brew install tmux
 make tmux
 ```
 
@@ -26,7 +27,16 @@ the first execution of tmux might take a while.
 
 ## Ghostty configuration
 
-Prerequisite : install tmux
+Prerequisite: install ghostty, tmux
+
+Install the theme used. e.g, for the catppuccin-macchiato theme:
+
+```bash
+mkdir -p $HOME/.config/ghostty/themes
+curl https://raw.githubusercontent.com/catppuccin/ghostty/refs/heads/main/themes/catppuccin-macchiato.conf -o "$HOME/.config/ghostty/themes/catppuccin-macchiato"
+```
+
+Install the ghostty config:
 
 ```bash
 make ghostty
@@ -46,6 +56,8 @@ take a look at the kickstart github and see if maybe they addressed it.
 
 ### Installation
 
+Prerequisite: install ripgrep (telescope dependency).
+
 (Eventually) backup the current config :
 
 ```bash
@@ -55,17 +67,10 @@ mv ${HOME}/.local/state/nvim ${HOME}/.local/state/nvim.bak
 mv ${HOME}/.cache/nvim ${HOME}/.cache/nvim.bak
 ```
 
-Install this config :
+Install the config :
 
 ```bash
 make nvim
-```
-
-Install dependencies :
-
-```bash
-# ripgrep is required for telescopes's grepping features
-brew install ripgrep
 ```
 
 ## profile.d configuration
