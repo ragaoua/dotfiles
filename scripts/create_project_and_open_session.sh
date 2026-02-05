@@ -20,7 +20,7 @@ while [ "${#}" -gt 0 ]; do
       exit 1
       ;;
     *)
-      if [ -n "${project_name}" ]; then
+      if [ -n "${project_name:-}" ] ; then
         echo "Unexpected extra argument: ${1}" >&2
         exit 1
       fi
@@ -33,7 +33,7 @@ done
 readonly repo_slug
 readonly projects_dir="${HOME}/Projects"
 
-if [ -z "${project_name}" ]; then
+if [ -z "${project_name:-}" ]; then
   if [ -z "${repo_slug}" ]; then
     read -r -p "Project directory name: " project_name
   else
