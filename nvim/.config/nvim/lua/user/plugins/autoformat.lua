@@ -3,7 +3,7 @@ return {
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
-    keys = {
+		keys = {
 			{
 				"<leader>f",
 				function()
@@ -35,8 +35,8 @@ return {
 				lua = { "stylua" },
 				python = { "black" },
 				go = { "goimports", "gofumpt" },
-				javascript = { "prettier" },
-				typescript = { "prettier" },
+				javascript = { "prettierd" },
+				typescript = { "prettierd" },
 				["*"] = { "codespell" },
 				["_"] = { "trim_whitespace" },
 			},
