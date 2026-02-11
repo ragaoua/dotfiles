@@ -166,7 +166,6 @@ return {
 				prettierd = {},
 				oxlint = {},
 				ts_ls = {},
-				tsgo = {},
 				-- Python
 				basedpyright = {},
 				ruff = {},
