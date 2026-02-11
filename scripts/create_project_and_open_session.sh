@@ -55,7 +55,7 @@ if [ -e "${project_path}" ] && [ -n "$(ls -A "${project_path}" 2>/dev/null)" ]; 
   exit 3
 fi
 
-if [ -n "${repo_slug}" ]; then
+if [ -n "${repo_slug:-}" ]; then
   git_clone_command="gh repo clone ${repo_slug} \"${project_path}\""
 
   if [ -z "${TMUX:-}" ] ; then
