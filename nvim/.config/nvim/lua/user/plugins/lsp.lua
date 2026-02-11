@@ -164,7 +164,7 @@ return {
 				},
 				-- Typescript
 				prettierd = {},
-				oxlint = {},
+				eslint = {},
 				ts_ls = {},
 				-- Python
 				basedpyright = {},
