@@ -29,7 +29,7 @@ readonly project_name="$(basename "$project_full_path" | slugify)"
 
 if ! tmux has-session -t "$project_name" 2>/dev/null ; then
   tmux new-session -d -s "$project_name" -c "$project_full_path" \; rename-window bash
-  tmux new-window -t "$project_name" -c "$project_full_path" -n nvim "$SHELL -ic \"nvim .\""
+  tmux new-window -t "$project_name" -c "$project_full_path" -n nvim "$SHELL -lic \"nvim .\""
 fi
 
 cmd="attach-session"
