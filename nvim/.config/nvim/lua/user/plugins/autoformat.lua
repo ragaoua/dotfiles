@@ -37,6 +37,7 @@ return {
 				go = { "goimports", "gofumpt" },
 				javascript = { "prettierd" },
 				typescript = { "prettierd" },
+				java = { "google-java-format" },
 				["*"] = { "codespell" },
 				["_"] = { "trim_whitespace" },
 			},
