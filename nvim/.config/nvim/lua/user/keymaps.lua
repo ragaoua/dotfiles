@@ -78,3 +78,8 @@ end, { noremap = true, silent = true, desc = "Toggle quickfix list" })
 
 -- Others
 vim.keymap.set("n", "J", "mzJ`z", { desc = "Join lines and keep cursor position" })
+vim.keymap.set("n", "y<C-g>", function()
+	local filepath = vim.fn.expand("%:p")
+	vim.fn.setreg("+", filepath)
+	print("Copied: " .. filepath)
+end, { desc = "Copy current (absolute) file path" })
