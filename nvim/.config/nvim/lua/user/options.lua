@@ -73,3 +73,7 @@ vim.opt.foldlevel = 99 -- Start with all folds open
 -- Split behavior
 vim.opt.splitbelow = true -- Horizontal splits go below
 vim.opt.splitright = true -- Vertical splits go right
+
+-- Allow local config (.nvim.lua)
+vim.opt.exrc = true
+vim.opt.secure = true
