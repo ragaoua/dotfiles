@@ -42,6 +42,14 @@ return {
 			)
 			vim.keymap.set("n", "<leader>gp", gs.preview_hunk, { desc = "Gitsigns: Preview hunk" })
 
+			-- Navigate
+			vim.keymap.set("n", "]c", function()
+				gs.nav_hunk("next")
+			end, { desc = "Gitsigns: Jump to next hunk" })
+			vim.keymap.set("n", "[c", function()
+				gs.nav_hunk("prev")
+			end, { desc = "Gitsigns: Jump to previous hunk" })
+
 			-- Blame
 			vim.keymap.set("n", "<leader>gb", function()
 				gs.blame_line({ full = true })
