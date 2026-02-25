@@ -20,14 +20,8 @@ return {
 		},
 		{
 			"<leader>fe",
-			function()
-				require("neo-tree.command").execute({
-					toggle = true,
-					source = "filesystem",
-					dir = vim.fn.expand("%:p:h"),
-				})
-			end,
-			desc = "NeoTree toggle current buffer's filesystem",
+			":Neotree reveal<CR>",
+			desc = "NeoTree reveal and focus current buffer",
 		},
 		{
 			"<leader>ne",
