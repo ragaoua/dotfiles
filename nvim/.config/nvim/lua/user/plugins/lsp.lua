@@ -171,6 +171,10 @@ return {
 				ruff = {},
 				-- Java
 				jdtls = {},
+				-- Shell
+				shfmt = {},
+				bashls = {},
+				shellcheck = {},
 				-- Yaml
 				yamlls = {},
 			}
