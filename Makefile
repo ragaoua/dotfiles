@@ -42,3 +42,8 @@ inputrc:
 opencode:
 	stow -t "$(HOME)" opencode
 	@echo "✅ opencode config installed"
+
+.PHONY: tig
+tig:
+	stow -t "$(HOME)" tig
+	@echo "✅ tig config installed"
