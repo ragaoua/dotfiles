@@ -38,6 +38,7 @@ return {
 				javascript = { "prettierd" },
 				typescript = { "prettierd" },
 				java = { "google-java-format" },
+				markdown = { "prettierd" },
 				["*"] = { "codespell" },
 				["_"] = { "trim_whitespace" },
 			},
