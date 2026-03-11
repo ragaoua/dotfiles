@@ -51,14 +51,13 @@ return {
 					local telescope = require("telescope.builtin")
 
 					-- Add "goto" keymaps to default ones
-					map("n", "grd", telescope.lsp_definitions, "[G]oto [R]eference [D]definition")
+					map("n", "grd", vim.lsp.buf.definition, "[G]oto [R]eference [D]efinition")
 					map("n", "grD", vim.lsp.buf.declaration, "[G]oto [R]eference [D]eclaration")
-					map("n", "grt", telescope.lsp_type_definitions, "[G]oto [R]eference [T]ype Definition")
 
 					-- Hijack existing "goto" keymaps by telescope
 					-- Telescope is great for there because it provides previews
 					map("n", "grr", telescope.lsp_references, "[G]oto [R]eference [R]eferences")
-					map("n", "gri", telescope.lsp_implementations, "[G]oto [R]eference [I]mplementation")
+					map("n", "grt", telescope.lsp_type_definitions, "[G]oto [R]eference [T]ype Definition")
 
 					-- This function resolves a difference between neovim nightly (version 0.11) and stable (version 0.10)
 					---@param client vim.lsp.Client
