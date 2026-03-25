@@ -9,7 +9,7 @@ return {
 				topdelete = { text = "‾" },
 				changedelete = { text = "~" },
 			},
-			current_line_blame = true,
+			current_line_blame = false,
 		},
 		config = function(_, opts)
 			local function gitsigns_visual_op(op)
