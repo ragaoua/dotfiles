@@ -14,8 +14,8 @@ readonly window_target_index="$1"
 readonly window_name="$2"
 readonly window_shell_command="${3:-}"
 readonly window_initial_index="$(
-  tmux list-windows -F "#{window_index} #{window_name}" |
-    awk -v name="$window_name" '$2 == name {print $1}'
+  tmux list-windows -F "#{window_index}:#{window_name}" |
+    awk -F ':' -v name="$window_name" '$2 == name {print $1; exit}'
 )"
 
 if [ "$window_initial_index" = "$window_target_index" ] ; then
