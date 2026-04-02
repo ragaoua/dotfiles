@@ -18,6 +18,31 @@ return {
 		{ "nvim-tree/nvim-web-devicons", enabled = vim.g.have_nerd_font },
 	},
 	config = function()
+		-- NOTE: I would rather have `toggle_[ff/lg]no_ignore` functions that
+		-- toggle `no_ignore`/`--no-ignore` on and off but that would require
+		-- having access to the current state of no_ignore which the telescope
+		-- API doesn't seem to provide. But this is good enough.
+		local function enable_ff_no_ignore(prompt_bufnr)
+			local actions_state = require("telescope.actions.state")
+
+			local query = actions_state.get_current_line()
+			require("telescope.builtin").find_files({
+				no_ignore = true,
+				default_text = query,
+			})
+		end
+		local function enable_lg_no_ignore(prompt_bufnr)
+			local actions_state = require("telescope.actions.state")
+
+			local query = actions_state.get_current_line()
+			require("telescope.builtin").live_grep({
+				additional_args = function()
+					return { "--no-ignore", "--hidden" }
+				end,
+				default_text = query,
+			})
+		end
+
 		local telescope = require("telescope")
 		telescope.setup({
 			extensions = {
@@ -28,13 +53,23 @@ return {
 			pickers = {
 				find_files = {
 					hidden = true,
+					mappings = {
+						i = {
+							["<c-h>"] = enable_ff_no_ignore,
+						},
+					},
 				},
 				live_grep = {
 					hidden = true,
+					mappings = {
+						i = {
+							["<c-h>"] = enable_lg_no_ignore,
+						},
+					},
 				},
 			},
 			defaults = {
-				file_ignore_patterns = { "%.git/", "venv/" },
+				file_ignore_patterns = { "%.git/" },
 				mappings = {
 					i = {
 						["<c-d>"] = require("telescope.actions").delete_buffer,
