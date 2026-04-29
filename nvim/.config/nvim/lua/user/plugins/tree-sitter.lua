@@ -1,25 +1,10 @@
 return { -- Highlight, edit, and navigate code
 	"nvim-treesitter/nvim-treesitter",
+	commit = "cf12346a3414fa1b06af75c79faebe7f76df080a",
 	build = ":TSUpdate",
-	main = "nvim-treesitter.config",
+	main = "nvim-treesitter.configs",
 	opts = {
-		ensure_installed = {
-			"bash",
-			"c",
-			"go",
-			"python",
-			"diff",
-			"html",
-			"lua",
-			"luadoc",
-			"markdown",
-			"markdown_inline",
-			"query",
-			"vim",
-			"vimdoc",
-		},
 		highlight = { enable = true },
-		-- Autoinstall languages that are not installed
 		auto_install = true,
 		indent = { enable = true },
 	},
