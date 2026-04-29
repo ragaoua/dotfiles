@@ -1,7 +1,7 @@
 return { -- Highlight, edit, and navigate code
 	"nvim-treesitter/nvim-treesitter",
 	build = ":TSUpdate",
-	main = "nvim-treesitter.configs",
+	main = "nvim-treesitter.config",
 	opts = {
 		ensure_installed = {
 			"bash",
@@ -18,7 +18,7 @@ return { -- Highlight, edit, and navigate code
 			"vim",
 			"vimdoc",
 		},
-    highlight = { enable = true },
+		highlight = { enable = true },
 		-- Autoinstall languages that are not installed
 		auto_install = true,
 		indent = { enable = true },
