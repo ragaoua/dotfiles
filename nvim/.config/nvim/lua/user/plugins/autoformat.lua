@@ -18,7 +18,7 @@ return {
 			format_on_save = function(bufnr)
 				-- Cases where format_on_save should be disabled
 				local disable_filetypes = {
-					typst = true,
+					-- typst = true,
 				}
 				local is_fugitive_bfr = vim.api.nvim_buf_get_name(bufnr):match("^fugitive://")
 
@@ -33,13 +33,23 @@ return {
 			end,
 			formatters_by_ft = {
 				lua = { "stylua" },
-				python = { "black" },
-				go = { "goimports", "gofumpt" },
+				python = { "ruff_fix", "ruff_format" },
 				javascript = { "prettierd" },
 				typescript = { "prettierd" },
+				svelte = { "prettierd" },
+				html = { "prettierd" },
+				css = { "prettierd" },
+				scss = { "prettierd" },
+				less = { "prettierd" },
+				yaml = { "prettierd" },
+				json = { "prettierd" },
+				jsonc = { "prettierd" },
 				java = { "google-java-format" },
 				markdown = { "prettierd" },
-				["*"] = { "codespell" },
+				mdx = { "prettierd" },
+				typst = { "typstyle" },
+				sh = { "shfmt" },
+				bash = { "shfmt" },
 				["_"] = { "trim_whitespace" },
 			},
 		},

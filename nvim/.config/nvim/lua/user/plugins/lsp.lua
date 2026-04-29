@@ -13,6 +13,7 @@ return {
 	{
 		"neovim/nvim-lspconfig",
 		dependencies = {
+			{ "b0o/SchemaStore.nvim", lazy = true },
 			"nvim-telescope/telescope.nvim",
 
 			{ "mason-org/mason.nvim", opts = {} },
@@ -48,11 +49,25 @@ return {
 					local map = function(mode, keys, func, desc)
 						vim.keymap.set(mode, keys, func, { buffer = event.buf, desc = "LSP: " .. desc })
 					end
+					local source_action = function(kind)
+						return function()
+							vim.lsp.buf.code_action({
+								apply = true,
+								context = {
+									only = { kind },
+									diagnostics = {},
+								},
+							})
+						end
+					end
 					local telescope = require("telescope.builtin")
 
 					-- Add "goto" keymaps to default ones
 					map("n", "grd", vim.lsp.buf.definition, "[G]oto [R]eference [D]efinition")
 					map("n", "grD", vim.lsp.buf.declaration, "[G]oto [R]eference [D]eclaration")
+					map({ "n", "x" }, "gra", vim.lsp.buf.code_action, "[C]ode [A]ction")
+					map("n", "grf", source_action("source.fixAll"), "[C]ode [F]ix All")
+					map("n", "gro", source_action("source.organizeImports"), "[C]ode [O]rganize Imports")
 
 					-- Hijack existing "goto" keymaps by telescope
 					-- Telescope is great for there because it provides previews
@@ -149,7 +164,6 @@ return {
 
 			local servers = {
 				-- Lua
-				stylua = {},
 				lua_ls = {
 					settings = {
 						Lua = {
@@ -161,28 +175,94 @@ return {
 						},
 					},
 				},
-				-- Typescript
-				prettierd = {},
+
+				-- Typescript/Javascript
+				vtsls = {},
 				eslint = {},
-				ts_ls = {},
+				svelte = {},
+
 				-- Python
 				basedpyright = {},
-				ruff = {},
+				ruff = {}, -- diagnostics and code actions
+
 				-- Java
 				jdtls = {},
+
+				-- HTML/CSS
+				html = {},
+				emmet_ls = {}, -- HTML/CSS/Tailwind/react/svelte/etc expansion and snippets
+				cssls = {},
+				stylelint_lsp = {}, -- CSS linter
+				tailwindcss = {},
+
 				-- Shell
-				shfmt = {},
 				bashls = {},
-				shellcheck = {},
+
+				-- Containers
+				docker_compose_language_service = {},
+				dockerls = {},
+
+				-- Typst
+				tinymist = {},
+
 				-- Yaml
-				yamlls = {},
+				yamlls = {
+					settings = {
+						yaml = {
+							schemaStore = {
+								enable = false,
+								url = "",
+							},
+							schemas = require("schemastore").yaml.schemas(),
+						},
+					},
+				},
+
+				-- JSON
+				jsonls = {
+					settings = {
+						json = {
+							schemas = require("schemastore").json.schemas(),
+							validate = { enable = true },
+						},
+					},
+				},
+
+				-- Markdown
+				markdown_oxide = {
+					capabilities = {
+						workspace = {
+							didChangeWatchedFiles = {
+								dynamicRegistration = true,
+							},
+						},
+					},
+				},
+
+				-- spell-checking
+				cspell_ls = {}, -- Linter LSP
 			}
-			local ensure_installed = vim.tbl_keys(servers or {})
-			vim.list_extend(ensure_installed, {
-				-- Java
-				"java-debug-adapter",
+
+			local tools = {
+				-- Formatters
 				"google-java-format",
-			})
+				"prettierd",
+				"shfmt",
+				"stylua",
+				"typstyle",
+
+				-- CLI linters wired through nvim-lint
+				"hadolint",
+				"htmlhint",
+				"markdownlint",
+				"shellcheck",
+
+				-- Java debugging
+				"java-debug-adapter",
+			}
+
+			local ensure_installed = vim.tbl_keys(servers or {})
+			vim.list_extend(ensure_installed, tools)
 			require("mason-tool-installer").setup({ ensure_installed = ensure_installed })
 
 			require("mason-lspconfig").setup({
@@ -193,11 +273,34 @@ return {
 						local server = servers[server_name] or {}
 						-- This handles overriding only values explicitly passed
 						-- by the server configuration above. Useful when disabling
-						-- certain features of an LSP (for example, turning off formatting for ts_ls)
+						-- certain features of an LSP on a per-server basis.
 						server.capabilities = vim.tbl_deep_extend("force", {}, capabilities, server.capabilities or {})
 						require("lspconfig")[server_name].setup(server)
 					end,
 				},
+			})
+		end,
+	},
+	{
+		"mfussenegger/nvim-lint",
+		event = { "BufReadPost", "BufNewFile" },
+		config = function()
+			local lint = require("lint")
+
+			lint.linters_by_ft = {
+				bash = { "shellcheck" },
+				dockerfile = { "hadolint" },
+				html = { "htmlhint" },
+				markdown = { "markdownlint" },
+				sh = { "shellcheck" },
+			}
+
+			local lint_augroup = vim.api.nvim_create_augroup("nvim-lint", { clear = true })
+			vim.api.nvim_create_autocmd({ "BufEnter", "BufWritePost", "InsertLeave" }, {
+				group = lint_augroup,
+				callback = function()
+					lint.try_lint()
+				end,
 			})
 		end,
 	},
