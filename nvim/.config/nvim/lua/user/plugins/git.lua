@@ -10,6 +10,10 @@ return {
 				changedelete = { text = "~" },
 			},
 			current_line_blame = false,
+			diff_opts = {
+				ignore_whitespace = false,
+				algorithm = "minimal",
+			},
 		},
 		config = function(_, opts)
 			local function gitsigns_visual_op(op)
