@@ -2,7 +2,7 @@
 description: Review of the code changes
 ---
 
-Review the current git diff and provide:
+Review the code and provide:
 
 1. **Summary**: What changed? (affected modules/layers, functional vs technical changes, overall intent)
 
@@ -35,4 +35,6 @@ Review the current git diff and provide:
 
 7. **Commit Message**: Suggest a concise commit message following this project's conventions
 
-Focus on the top 3-5 most impactful suggestions. Include code examples for non-obvious recommendations.
+Focus on the top 3 most impactful suggestions. Include code examples for non-obvious recommendations.
+
+Review scope: $1
