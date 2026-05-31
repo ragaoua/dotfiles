@@ -42,6 +42,10 @@ Install the ghostty config:
 make ghostty
 ```
 
+Put a file named "background.png" in the "$HOME/.config/ghostty/" directory.
+It will be picked up by the config to use as the background. If missing, keeps
+the default background.
+
 Then reload the Ghostty config (cmd+shift+,)
 
 ## Neovim configuration

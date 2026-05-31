@@ -6,6 +6,7 @@ return {
 		require("catppuccin").setup({
 			flavour = "macchiato",
 			show_end_of_buffer = true,
+			transparent_background = true,
 		})
 		vim.cmd.colorscheme("catppuccin")
 	end,
