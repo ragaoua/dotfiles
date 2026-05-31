@@ -20,3 +20,27 @@ vim.api.nvim_create_autocmd("BufReadPost", {
   end,
 })
 
+-- Open image files in the system default viewer instead of loading them as a buffer
+vim.api.nvim_create_autocmd("BufReadCmd", {
+	group = augroup,
+	pattern = {
+		"*.png",
+		"*.jpg",
+		"*.jpeg",
+		"*.gif",
+		"*.webp",
+		"*.avif",
+		"*.bmp",
+		"*.tiff",
+		"*.tif",
+		"*.svg",
+		"*.ico",
+		"*.heic",
+	},
+	callback = function(args)
+		vim.ui.open(args.file)
+		vim.schedule(function()
+			pcall(vim.api.nvim_buf_delete, args.buf, { force = true })
+		end)
+	end,
+})
