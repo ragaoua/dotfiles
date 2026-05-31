@@ -3,6 +3,11 @@ return {
 	ft = "typst",
 	version = "1.*",
 	config = function()
-		vim.keymap.set("n", "<leader>p", ":TypstPreview<CR>")
+		vim.api.nvim_create_autocmd("FileType", {
+			pattern = "typst",
+			callback = function(args)
+				vim.keymap.set("n", "<leader>p", ":TypstPreview<CR>", { buffer = args.buf })
+			end,
+		})
 	end,
 }
