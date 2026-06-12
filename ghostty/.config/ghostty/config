@@ -9,3 +9,4 @@ background-image-opacity = 0.10
 background-image-fit = cover
 background-image-position = center
 
+font-feature = -calt, -liga, -dlig
