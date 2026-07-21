@@ -57,6 +57,9 @@ vim.keymap.set("v", "c", "gc", { desc = "Toggle Comment Selection", remap = true
 -- Diagnostics and quickfix list
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show diagnostics under the cursor" })
 vim.keymap.set("n", "<leader>D", vim.diagnostic.setqflist, { desc = "Add all diagnostics to the quickfix list" })
+vim.keymap.set("n", "<leader>td", function()
+	vim.diagnostic.enable(not vim.diagnostic.is_enabled())
+end, { desc = "Toggle diagnostics" })
 vim.keymap.set("n", "<leader>q", function()
 	local qf = vim.fn.getwininfo()
 	local open = false
