@@ -101,7 +101,7 @@
         "LSFT(KC_RBRACKET)",
         "KC_9",
         "KC_RBRACKET",
-        "KC_NO",
+        "KC_CAPSLOCK",
         -1
       ],
       [
@@ -162,7 +162,7 @@
       ],
       [
         "KC_TRNS",
-        "KC_NO",
+        "KC_KP_0",
         "KC_KP_4",
         "KC_KP_5",
         "KC_KP_6",
@@ -207,7 +207,7 @@
       ],
       [
         "KC_TRNS",
-        "KC_NO",
+        "LSFT(KC_COMMA)",
         "LSFT(KC_3)",
         "LSFT(KC_2)",
         "LSFT(KC_1)",
