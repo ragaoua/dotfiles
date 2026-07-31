@@ -27,14 +27,11 @@ Review the code and provide:
 
 - TODOs, commented code, or debug statements
 - Missing tests or documentation
+- Code duplication
 - Anything that seems out of place
 
 6. **Documentation**:
 
 - Point out updates (if any) that should be made to this projects docs (README, CONTRIBUTING...)
 
-7. **Commit Message**: Suggest a concise commit message following this project's conventions
-
-Focus on the top 3 most impactful suggestions. Include code examples for non-obvious recommendations.
-
-Review scope: $1
+Include code examples for non-obvious recommendations.
