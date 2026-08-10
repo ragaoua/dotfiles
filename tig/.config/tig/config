@@ -1,1 +1,3 @@
 bind generic Y +@sh -c "printf %(commit) | pbcopy && echo Copied %(commit) to clipboard"
+
+source ~/.config/tig/theme
