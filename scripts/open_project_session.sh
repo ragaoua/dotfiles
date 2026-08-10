@@ -12,28 +12,32 @@ project_name="${1-}"
 
 readonly projects_dir="${HOME}/Projects"
 
-declare project_full_path;
-if [ -z "$project_name" ] ; then
+declare project_full_path
+if [ -z "$project_name" ]; then
   readonly search_dirs="$(fd . "$projects_dir" --type=directory --max-depth=1)"
   readonly project_full_path="$(echo "${search_dirs[@]}" | fzf --tmux)"
 else
   readonly project_full_path="${projects_dir}/${project_name}"
 fi
 
-if [ -z "$project_full_path" ] || [ ! -d "$project_full_path" ] ; then
+if [ -z "$project_full_path" ]; then
+  exit 0
+fi
+
+if [ ! -d "$project_full_path" ]; then
   echo >&2 "Directory \"$project_full_path\" not found"
   exit 1
 fi
 
 readonly project_name="$(basename "$project_full_path" | slugify)"
 
-if ! tmux has-session -t "$project_name" 2>/dev/null ; then
+if ! tmux has-session -t "$project_name" 2>/dev/null; then
   tmux new-session -d -s "$project_name" -c "$project_full_path" \; rename-window bash
   tmux new-window -t "$project_name" -c "$project_full_path" -n nvim "$SHELL -lic \"nvim .\""
 fi
 
 cmd="attach-session"
-if [ ! -z "$TMUX" ] ; then
+if [ ! -z "$TMUX" ]; then
   cmd="switch-client"
 fi
 
