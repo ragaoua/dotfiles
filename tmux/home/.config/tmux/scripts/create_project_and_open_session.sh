@@ -7,26 +7,26 @@ declare repo_slug
 
 while [ "${#}" -gt 0 ]; do
   case "${1}" in
-    --gh-repo)
-      if [ -z "${2}" ]; then
-        echo "Missing value for --gh-repo" >&2
-        exit 1
-      fi
-      repo_slug="${2}"
-      shift 2
-      ;;
-    --*)
-      echo "Unknown option: ${1}" >&2
+  --gh-repo)
+    if [ -z "${2}" ]; then
+      echo "Missing value for --gh-repo" >&2
       exit 1
-      ;;
-    *)
-      if [ -n "${project_name:-}" ] ; then
-        echo "Unexpected extra argument: ${1}" >&2
-        exit 1
-      fi
-      project_name="${1}"
-      shift
-      ;;
+    fi
+    repo_slug="${2}"
+    shift 2
+    ;;
+  --*)
+    echo "Unknown option: ${1}" >&2
+    exit 1
+    ;;
+  *)
+    if [ -n "${project_name:-}" ]; then
+      echo "Unexpected extra argument: ${1}" >&2
+      exit 1
+    fi
+    project_name="${1}"
+    shift
+    ;;
   esac
 done
 
@@ -58,7 +58,7 @@ fi
 if [ -n "${repo_slug:-}" ]; then
   git_clone_command="gh repo clone ${repo_slug} \"${project_path}\""
 
-  if [ -z "${TMUX:-}" ] ; then
+  if [ -z "${TMUX:-}" ]; then
     $git_clone_command
   else
     tmux display-popup -E -T "Cloning ${repo_slug}" "$git_clone_command"
