@@ -15,6 +15,14 @@ Then:
 - Add the content of `bash/PS1.sh` somewhere in the `/etc/bashrc` file.
 - Add `stty werase undef` to "`/etc/bashrc`."
 
+## Command Palette
+
+Prerequisites: install `fzf` and `jq`
+
+```bash
+make command_palette
+```
+
 ## Fzf
 
 ```bash

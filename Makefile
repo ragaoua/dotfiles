@@ -10,6 +10,13 @@ bash:
 	sudo stow --dir bash --target /etc/profile.d profile.d
 	@echo "Bash config installed"
 
+.PHONY: command_palette
+command_palette:
+	sudo stow --no-folding --dir command_palette --target "/usr/local/bin" bin
+	stow --no-folding --dir command_palette --target "$(HOME)" home
+	sudo stow --dir command_palette --target /etc/profile.d profile.d
+	@echo "Command palette installed"
+
 .PHONY: fzf
 fzf:
 	sudo stow --dir fzf --target /etc/profile.d profile.d

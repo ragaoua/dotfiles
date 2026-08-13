@@ -1,0 +1,6 @@
+[
+  {
+    "title": "Kubernetes, kubectl - list pods in every namespace",
+    "command": "kubectl get pods --all-namespaces"
+  }
+]
