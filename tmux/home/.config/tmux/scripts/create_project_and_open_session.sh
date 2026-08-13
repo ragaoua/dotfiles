@@ -44,27 +44,39 @@ fi
 readonly project_name
 
 if [ -z "${project_name}" ] || [[ ! "${project_name}" =~ ^[A-Za-z0-9_-]+$ ]]; then
-  echo >&2 "Invalid project name: '${project_name}'. Use only letters, numbers, dashes, and underscores."
-  exit 2
+  readonly msg="Invalid project name: '${project_name}'. Use only letters, numbers, dashes, and underscores."
+  if [ -z "${TMUX:-}" ]; then
+    echo >&2 $msg
+    exit 2
+  fi
+
+  tmux display-popup -T "Error" "echo >&2 $msg"
+  exit
 fi
 
 readonly project_path="${projects_dir}/${project_name}"
 
-if [ -e "${project_path}" ] && [ -n "$(ls -A "${project_path}" 2>/dev/null)" ]; then
-  echo "Project directory exists and is not empty: ${project_path}" >&2
-  exit 3
-fi
+if [ ! -e "${project_path}" ] || [ -z "$(ls -A "${project_path}" 2>/dev/null)" ]; then
+  if [ -n "${repo_slug:-}" ]; then
+    git_clone_command="gh repo clone ${repo_slug} \"${project_path}\""
 
-if [ -n "${repo_slug:-}" ]; then
-  git_clone_command="gh repo clone ${repo_slug} \"${project_path}\""
-
-  if [ -z "${TMUX:-}" ]; then
-    $git_clone_command
+    if [ -z "${TMUX:-}" ]; then
+      $git_clone_command
+    else
+      tmux display-popup -E -T "Cloning ${repo_slug}" "$git_clone_command"
+    fi
   else
-    tmux display-popup -E -T "Cloning ${repo_slug}" "$git_clone_command"
+    mkdir -p "${project_path}"
   fi
 else
-  mkdir -p "${project_path}"
+  if [ -z "${TMUX:-}" ]; then
+    echo >&2 "Project directory exists and is not empty: ${project_path}" >&2
+    exit 3
+  fi
+
+  tmux display-popup -E -T "Project already exists." \
+    "echo >&2 'Project directory already exists. Press any key to open session (Ctrl+C to abort)...';
+      read -n 1"
 fi
 
 readonly script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
