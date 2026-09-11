@@ -80,6 +80,23 @@ make karabiner
 make kubernetes
 ```
 
+## macOS
+
+The macOS configuration contains:
+
+- `NSWindowShouldDragOnGesture`, stored in `macos/config/GlobalPreferences.plist`.
+- The Caps Lock delay override, stored in a LaunchAgent plist that reapplies it
+  whenever you log in.
+
+Install and apply the configuration with:
+
+```bash
+make macos
+```
+
+The LaunchAgent will also run automatically at future logins. The current
+global preference may require affected applications to be restarted.
+
 ## Neovim
 
 This config has been heavily inspired by the [kickstart

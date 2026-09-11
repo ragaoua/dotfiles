@@ -48,6 +48,17 @@ kubernetes:
 	sudo stow --dir kubernetes --target /etc/profile.d profile.d
 	@echo "Kubernetes config installed"
 
+.PHONY: macos
+macos:
+	stow --no-folding --dir macos --target "$(HOME)" home
+	defaults write -g NSWindowShouldDragOnGesture -bool true
+	if launchctl print "gui/$$(id -u)/com.github.ragaoua.dotfiles.hidutil" >/dev/null 2>&1; then \
+		launchctl bootout "gui/$$(id -u)/com.github.ragaoua.dotfiles.hidutil"; \
+	fi
+	launchctl bootstrap "gui/$$(id -u)" \
+		"$(HOME)/Library/LaunchAgents/com.github.ragaoua.dotfiles.hidutil.plist"
+	@echo "macOS config installed and applied"
+
 .PHONY: nvim
 nvim:
 	stow --no-folding --dir nvim --target "$(HOME)" home
