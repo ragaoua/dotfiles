@@ -4,6 +4,12 @@
 
 Install make and stow.
 
+## AeroSpace
+
+```bash
+make aerospace
+```
+
 ## Bash
 
 ```bash

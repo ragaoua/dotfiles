@@ -4,6 +4,11 @@ SHELL := /bin/bash
 all:
 	@echo "Please define the targets explicitly"
 
+.PHONY: aerospace
+aerospace:
+	stow --no-folding --dir aerospace --target "$(HOME)" home
+	@echo "AeroSpace config installed"
+
 .PHONY: bash
 bash:
 	stow --no-folding --dir bash --target "$(HOME)" home
