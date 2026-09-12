@@ -6,6 +6,8 @@ Install make and stow.
 
 ## AeroSpace
 
+Prerequisites: install `JankyBorders`.
+
 ```bash
 make aerospace
 ```
