@@ -110,8 +110,17 @@ key-mapping.key-notation-to-key-code = {
     ################################ COMMANDS ################################
     ##########################################################################
     ##########################################################################
-    alt-enter = 'exec-and-forget open -na Ghostty'
-    alt-o = 'exec-and-forget open -na Safari'
+    alt-enter = '''exec-and-forget osascript -e '
+      tell application "Ghostty"
+          new window
+      end tell'
+    '''
+    alt-o = '''exec-and-forget osascript -e '
+      tell application "Safari"
+          make new document at end of documents
+          activate
+      end tell'
+    '''
 
     ###########################################################################
     ###########################################################################
