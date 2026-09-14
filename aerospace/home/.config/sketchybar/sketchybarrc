@@ -1,0 +1,17 @@
+sketchybar --bar position=top
+
+sketchybar --add event aerospace_workspace_changed
+sketchybar --add item workspace_change_watcher left \
+    --subscribe workspace_change_watcher aerospace_workspace_changed \
+    --set workspace_change_watcher \
+    drawing=off \
+    script="$CONFIG_DIR/plugins/aerospace_on_workspace_changed.sh"
+
+sketchybar --add event aerospace_node_moved_to_workspace
+sketchybar --add item node_move_watcher left \
+    --subscribe node_move_watcher aerospace_node_moved_to_workspace \
+    --set node_move_watcher \
+    drawing=off \
+    script="$CONFIG_DIR/plugins/aerospace_on_node_moved_to_workspace.sh"
+
+"$CONFIG_DIR/plugins/aerospace_init_workspaces.sh"

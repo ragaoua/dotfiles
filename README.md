@@ -6,7 +6,7 @@ Install make and stow.
 
 ## AeroSpace
 
-Prerequisites: install `JankyBorders`.
+Prerequisites: install `JankyBorders`, `SketchyBar`, and `jq`.
 
 ```bash
 make aerospace
