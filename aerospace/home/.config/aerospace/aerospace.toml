@@ -111,7 +111,11 @@ key-mapping.key-notation-to-key-code = {
   colon='period',
 }
 
-# TODO: configure Finder to always be a floating window
+# Finder windows should always float
+[[on-window-detected]]
+if = 'test %{app-bundle-id} = com.apple.finder'
+run = ['layout floating']
+check-further-callbacks = true
 
 [mode.main.binding]
     ##########################################################################
