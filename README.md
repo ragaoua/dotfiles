@@ -2,13 +2,29 @@
 
 ## Global prerequisites
 
-Install make and stow.
+```bash
+brew install make stow
+
+sudo mkdir -p /etc/profile.d
+# Source scripts in /etc/profile.d, for instance:
+cat >>/etc/profile <<EOF
+if [ -d /etc/profile.d ] ; then
+	for script in /etc/profile.d/*.sh ; do
+		if [ -r "$script" ] ; then
+			. "$script"
+		fi
+	done
+fi
+EOF
+
+sudo mkdir -p /usr/local/bin # Make sure it's in the PATH
+```
 
 ## AeroSpace
 
-Prerequisites: install `JankyBorders`, `SketchyBar`, and `jq`.
-
 ```bash
+brew install --cask nikitabobko/tap/aerospace
+brew install FelixKratz/formulae/borders FelixKratz/formulae/sketchybar jq
 make aerospace
 ```
 
@@ -25,23 +41,23 @@ Then:
 
 ## Command Palette
 
-Prerequisites: install `fzf` and `jq`
-
 ```bash
+brew install fzf jq
 make command_palette
 ```
 
 ## Fzf
 
 ```bash
+brew install fzf
 make fzf
 ```
 
 ## Ghostty
 
-Prerequisite: install tmux.
-
 ```bash
+brew install --cask ghostty
+brew install tmux
 make ghostty
 ```
 
@@ -73,12 +89,14 @@ make git
 ## Karabiner
 
 ```bash
+brew install --cask karabiner-elements
 make karabiner
 ```
 
 ## Kubernetes
 
 ```bash
+brew install kubectl
 make kubernetes
 ```
 
@@ -114,8 +132,10 @@ and see if maybe they addressed it.
 
 ### Installation
 
-Prerequisite: install ripgrep (telescope dependency) and npm (to install Mason
-packages).
+```bash
+# ripgrep for telescope, npm for installing mason packages
+brew install ripgrep npm
+```
 
 (Eventually) backup the current config :
 
@@ -129,6 +149,7 @@ mv "${HOME}/.cache/nvim" "${HOME}/.cache/nvim.bak"
 Then:
 
 ```bash
+brew install neovim
 make nvim
 ```
 
@@ -146,29 +167,27 @@ mv "${HOME}/.cache/opencode" "${HOME}/.cache/opencode.bak"
 Then:
 
 ```bash
+brew install opencode
 make opencode
 ```
 
 ## Podman
 
 ```bash
+brew install podman
 make podman
 ```
 
 ## Tig
 
 ```bash
+brew install tig
 make tig
 ```
 
 ## Tmux
 
-Prerequisite: install fzf and fd (used by my custom tmux scripts).
-
 ```bash
+brew install tmux fzf fd
 make tmux
 ```
-
-When running `tmux` for the first time after that, the config will try
-and bootstrap `tpm` by cloning it then installing all plugins configured. So,
-the first execution of tmux might take a while.
