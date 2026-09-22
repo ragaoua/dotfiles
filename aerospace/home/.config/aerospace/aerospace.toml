@@ -10,7 +10,14 @@ config-version = 2
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
   'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0',
-  'exec-and-forget sketchybar'
+  'exec-and-forget sketchybar',
+  # Mission Control renders AeroSpace's windows way too small unless windows are
+  # grouped by application. Only restart the Dock when the setting isn't set yet
+  # See: https://nikitabobko.github.io/AeroSpace/guide#a-note-on-mission-control
+  '''exec-and-forget /bin/bash -c '
+    [ "$(defaults read com.apple.dock expose-group-apps 2>/dev/null)" = 1 ] && exit
+    defaults write com.apple.dock expose-group-apps -bool true && killall Dock'
+  '''
 ]
 
 exec-on-workspace-change = ['/bin/bash', '-c',
