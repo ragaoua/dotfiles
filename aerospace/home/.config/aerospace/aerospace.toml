@@ -10,7 +10,6 @@ config-version = 2
 # Available commands : https://nikitabobko.github.io/AeroSpace/commands
 after-startup-command = [
   'exec-and-forget borders active_color=0xffe1e3e4 inactive_color=0xff494d64 width=5.0',
-  'exec-and-forget sketchybar',
   # Mission Control renders AeroSpace's windows way too small unless windows are
   # grouped by application. Only restart the Dock when the setting isn't set yet
   # See: https://nikitabobko.github.io/AeroSpace/guide#a-note-on-mission-control
@@ -18,10 +17,6 @@ after-startup-command = [
     [ "$(defaults read com.apple.dock expose-group-apps 2>/dev/null)" = 1 ] && exit
     defaults write com.apple.dock expose-group-apps -bool true && killall Dock'
   '''
-]
-
-exec-on-workspace-change = ['/bin/bash', '-c',
-    'sketchybar --trigger aerospace_workspace_changed PREVIOUS_WORKSPACE=$AEROSPACE_PREV_WORKSPACE CURRENT_WORKSPACE=$AEROSPACE_FOCUSED_WORKSPACE'
 ]
 
 # Start AeroSpace at login
@@ -207,21 +202,21 @@ check-further-callbacks = true
     alt-w = 'workspace W'
     alt-x = 'workspace X'
     alt-z = 'workspace Z'
-    alt-shift-a = ['move-node-to-workspace A', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=A']
-    alt-shift-b = ['move-node-to-workspace B', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=B']
-    alt-shift-c = ['move-node-to-workspace C', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=C']
-    alt-shift-d = ['move-node-to-workspace D', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=D']
-    alt-shift-e = ['move-node-to-workspace E', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=E']
-    alt-shift-f = ['move-node-to-workspace F', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=F']
-    alt-shift-g = ['move-node-to-workspace G', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=G']
-    alt-shift-q = ['move-node-to-workspace Q', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=Q']
-    alt-shift-r = ['move-node-to-workspace R', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=R']
-    alt-shift-s = ['move-node-to-workspace S', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=S']
-    alt-shift-t = ['move-node-to-workspace T', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=T']
-    alt-shift-v = ['move-node-to-workspace V', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=V']
-    alt-shift-w = ['move-node-to-workspace W', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=W']
-    alt-shift-x = ['move-node-to-workspace X', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=X']
-    alt-shift-z = ['move-node-to-workspace Z', 'exec-and-forget sketchybar --trigger aerospace_node_moved_to_workspace WORKSPACE=Z']
+    alt-shift-a = ['move-node-to-workspace A']
+    alt-shift-b = ['move-node-to-workspace B']
+    alt-shift-c = ['move-node-to-workspace C']
+    alt-shift-d = ['move-node-to-workspace D']
+    alt-shift-e = ['move-node-to-workspace E']
+    alt-shift-f = ['move-node-to-workspace F']
+    alt-shift-g = ['move-node-to-workspace G']
+    alt-shift-q = ['move-node-to-workspace Q']
+    alt-shift-r = ['move-node-to-workspace R']
+    alt-shift-s = ['move-node-to-workspace S']
+    alt-shift-t = ['move-node-to-workspace T']
+    alt-shift-v = ['move-node-to-workspace V']
+    alt-shift-w = ['move-node-to-workspace W']
+    alt-shift-x = ['move-node-to-workspace X']
+    alt-shift-z = ['move-node-to-workspace Z']
 
     alt-tab = 'workspace-back-and-forth'
 
