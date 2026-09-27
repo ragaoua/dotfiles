@@ -26,13 +26,19 @@ Commands:
 
     <enter>/n next                   6.3   jump to a stop
     p         previous               6     jump to a unit's first stop
-    .         rationale, here        l     route     (l 6 = one unit)
-    w         re-sync from Hunk      u     units
-    ?         help                   r     reset to the top
-    q         quit
+    S         stage hunk, go next    .     rationale, here
+    w         re-sync from Hunk      l     route     (l 6 = one unit)
+    ?         help                   u     units
+    r         reset to the top       q     quit
+
+S stages the current stop's hunk into the git index (git apply --cached)
+and moves on. It assumes the session reviews the worktree against a
+revision (hunk diff HEAD, hunk diff main...), where staging does not
+change the reviewed diff — not plain `hunk diff`, whose view it would
+shrink.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 import os
 import re
@@ -41,12 +47,14 @@ import sys
 
 CU_ARG_RE = re.compile(r"^\d+(\.\d+)?$")
 CU_PREFIX_RE = re.compile(r"^CU\s+([\d.]+)\s*[—-]\s*")
+HUNK_HEADER_RE = re.compile(r"^@@ -\d+(?:,\d+)? \+(\d+)(?:,(\d+))? @@")
 
 
 @dataclass
 class ReviewState:
     cursor: int = 0
     positioned: bool = False
+    staged: set = field(default_factory=set)
 
 
 def strip_prefix(summary):
@@ -136,6 +144,29 @@ def apply_comments(repo, data_path):
         sys.exit(result.returncode)
 
 
+def fetch_ranges(repo):
+    """Map (filePath, 1-based hunk index) -> worktree line range of that hunk."""
+    result = subprocess.run(
+        ["hunk", "session", "review", "--repo", repo, "--json"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return {}
+    try:
+        files = json.loads(result.stdout)["review"]["files"]
+    except (json.JSONDecodeError, KeyError, TypeError):
+        return {}
+    ranges = {}
+    for f in files:
+        for h in f.get("hunks", []):
+            new_range = h.get("newRange")
+            if new_range:
+                lo, hi = new_range
+                ranges[(f["path"], h["index"] + 1)] = (lo, max(hi, lo))
+    return ranges
+
+
 def sync_cursor(repo, route, state, announce=False):
     result = subprocess.run(
         ["hunk", "session", "context", "--repo", repo, "--json"],
@@ -202,6 +233,79 @@ def navigate(repo, stop):
             )
         return False
     return True
+
+
+def git(repo, *args, input=None):
+    return subprocess.run(
+        ["git", "-C", repo, *args],
+        input=input,
+        capture_output=True,
+        text=True,
+    )
+
+
+def slice_hunk(diff_text, lo, hi):
+    """Extract the file header plus the one hunk overlapping worktree [lo, hi]."""
+    header, hunks, current = [], [], None
+    for line in diff_text.splitlines(keepends=True):
+        if line.startswith("@@ "):
+            current = [line]
+            hunks.append(current)
+        elif current is None:
+            header.append(line)
+        else:
+            current.append(line)
+    for hunk in hunks:
+        m = HUNK_HEADER_RE.match(hunk[0])
+        if not m:
+            continue
+        start = int(m.group(1))
+        count = int(m.group(2)) if m.group(2) else 1
+        end = start + count - 1 if count else start + 1
+        if start <= hi and lo <= end:
+            patch = "".join(header + hunk)
+            return patch if patch.endswith("\n") else patch + "\n"
+    return None
+
+
+def stage_stop(repo, stop, ranges):
+    """Stage the stop's hunk into the git index. False = stay on this stop."""
+    path, hunk = stop["filePath"], stop["hunk"]
+    target = ranges.get((path, hunk))
+    if target is None:
+        print(f"No line range for {path} hunk {hunk} — press w to re-sync.")
+        return False
+
+    if git(repo, "ls-files", "--error-unmatch", "--", path).returncode != 0:
+        add = git(repo, "add", "-N", "--", path)
+        if add.returncode != 0:
+            err = (add.stderr or add.stdout).strip()
+            print(f"git add -N failed: {err}", file=sys.stderr)
+            return False
+
+    lo, hi = target
+    patch = slice_hunk(git(repo, "diff", "--", path).stdout, lo, hi)
+    if patch is None:
+        staged = slice_hunk(git(repo, "diff", "--staged", "--", path).stdout, lo, hi)
+        if staged is not None:
+            print(f"{DIM}already staged.{OFF}")
+            return True
+        print("Hunk not found in the worktree diff — did the file change?")
+        return False
+
+    result = git(repo, "apply", "--cached", input=patch)
+    if result.returncode != 0:
+        err = (result.stderr or result.stdout).strip()
+        print(f"stage failed: {err}", file=sys.stderr)
+        return False
+    return True
+
+
+def stage(repo, route, state, ranges):
+    if stage_stop(repo, route[state.cursor], ranges):
+        state.staged.add(state.cursor)
+        print(f"{DIM}staged — {len(state.staged)}/{len(route)} stops{OFF}")
+        move(repo, route, state, 1)
 
 
 def show(stop, index, total):
@@ -292,12 +396,16 @@ def show_note(route, state):
     print()
 
 
-def where(repo, route, state):
+def where(repo, route, state, ranges):
+    fresh = fetch_ranges(repo)
+    if fresh:
+        ranges.clear()
+        ranges.update(fresh)
     if sync_cursor(repo, route, state, announce=True):
         show(route[state.cursor], state.cursor, len(route))
 
 
-def dispatch(repo, route, unit_titles, state, args):
+def dispatch(repo, route, unit_titles, state, ranges, args):
     """Returns False to end an interactive session."""
     cmd = args[0]
     rest = args[1:]
@@ -308,6 +416,8 @@ def dispatch(repo, route, unit_titles, state, args):
         move(repo, route, state, 1 if state.positioned else 0)
     elif cmd in ("prev", "p", "back", "b"):
         move(repo, route, state, -1)
+    elif cmd in ("stage", "s", "S"):
+        stage(repo, route, state, ranges)
     elif cmd in ("goto", "g", "jump"):
         if not rest:
             print("usage: 6.3")
@@ -320,7 +430,7 @@ def dispatch(repo, route, unit_titles, state, args):
     elif cmd in (".", "note", "notes", "why"):
         show_note(route, state)
     elif cmd in ("where", "w"):
-        where(repo, route, state)
+        where(repo, route, state, ranges)
     elif cmd in ("r", "reset"):
         state.cursor = 0
         state.positioned = False
@@ -334,7 +444,7 @@ def dispatch(repo, route, unit_titles, state, args):
     return True
 
 
-def repl(repo, route, unit_titles, state):
+def repl(repo, route, unit_titles, state, ranges):
     try:
         import readline  # noqa: F401
     except ImportError:
@@ -343,7 +453,9 @@ def repl(repo, route, unit_titles, state):
     n_units = len({s["unit"] for s in route})
     i = state.cursor
     print(f"\n  Hunk guided review — {len(route)} stops, {n_units} units.")
-    print(f"  {DIM}enter=next  p=prev  6.3=jump  .=rationale  ?=help  q=quit{OFF}")
+    print(
+        f"  {DIM}enter=next  p=prev  6.3=jump  S=stage  .=rationale  ?=help  q=quit{OFF}"
+    )
     show(route[i], i, len(route))
 
     while True:
@@ -353,7 +465,7 @@ def repl(repo, route, unit_titles, state):
         except (EOFError, KeyboardInterrupt):
             print()
             return
-        if not dispatch(repo, route, unit_titles, state, line.split() or ["next"]):
+        if not dispatch(repo, route, unit_titles, state, ranges, line.split() or ["next"]):
             return
 
 
@@ -366,9 +478,10 @@ def main():
     repo, unit_titles, route = load_data(data_path)
     apply_comments(repo, data_path)
     state = ReviewState()
+    ranges = fetch_ranges(repo)
     sync_cursor(repo, route, state)
 
-    repl(repo, route, unit_titles, state)
+    repl(repo, route, unit_titles, state, ranges)
 
 
 if __name__ == "__main__":
