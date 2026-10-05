@@ -31,6 +31,19 @@ return {
 					lsp_format = "fallback",
 				}
 			end,
+			formatters = {
+				prettierd = {
+					-- Wrap markdown at 80 chars, used only when the project has no prettier config
+					-- (prettierd ignores "overrides" in its default config, hence the per-filetype env)
+					env = function(_, ctx)
+						local ft = vim.bo[ctx.buf].filetype
+						if ft == "markdown" or ft == "mdx" then
+							return { PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath("config") .. "/prettierrc-markdown.json" }
+						end
+						return {}
+					end,
+				},
+			},
 			formatters_by_ft = {
 				lua = { "stylua" },
 				python = { "ruff_fix", "ruff_format" },
