@@ -75,6 +75,12 @@ podman:
 	sudo stow --dir podman --target /etc/profile.d profile.d
 	@echo "Podman config installed"
 
+.PHONY: secrets
+secrets:
+	sudo stow --no-folding --dir secrets --target "/usr/local/bin" bin
+	sudo stow --dir secrets --target /etc/profile.d profile.d
+	@echo "Secrets installed"
+
 .PHONY: tig
 tig:
 	stow --no-folding --dir tig --target "$(HOME)" home

@@ -178,6 +178,26 @@ brew install podman
 make podman
 ```
 
+## Secrets
+
+A small secrets manager: each secret (a name and a value) is stored as a
+gpg-encrypted file in `~/.local/share/secrets` (override with `SECRETS_DIR`).
+
+```bash
+brew install gnupg fzf
+make secrets
+
+# If needed, create a key first: gpg --full-generate-key
+secrets init <gpg-id>
+```
+
+`Ctrl-x s` opens an fzf picker: `Enter` copies the selected secret to the
+clipboard (cleared after 45s, see `SECRETS_CLIP_TIME`), `C-a` adds a secret
+named after the query, `C-e` edits, `C-d` deletes and `C-r` renames.
+
+From the command line, see `secrets --help`. Values are prompted for (hidden),
+or read from stdin, e.g. `secrets add ssh/key < key.pem`.
+
 ## Tig
 
 ```bash
