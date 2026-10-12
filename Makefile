@@ -65,6 +65,12 @@ nvim:
 	sudo stow --dir nvim --target /etc/profile.d profile.d
 	@echo "Neovim config installed"
 
+.PHONY: notes
+notes:
+	sudo stow --no-folding --dir notes --target "/usr/local/bin" bin
+	sudo stow --dir notes --target /etc/profile.d profile.d
+	@echo "Notes installed"
+
 .PHONY: opencode
 opencode:
 	stow --no-folding --dir opencode --target "$(HOME)" home

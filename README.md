@@ -154,6 +154,19 @@ brew install neovim
 make nvim
 ```
 
+## Notes
+
+```bash
+make notes
+make tmux
+```
+
+`<prefix> N` opens the note of the current pane's project in a tmux popup, with
+`$VISUAL`/`$EDITOR`. Quitting the editor closes the popup.
+
+From the command line, `notes` opens the current project's note in the terminal.
+See `notes --help`.
+
 ## Opencode
 
 (Eventually) backup the current config :
