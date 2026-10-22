@@ -32,6 +32,7 @@ Commands:
   copy <name>          Copy the value to the clipboard, cleared after ${SECRETS_CLIP_TIME}s
   ls                   List secret names
   search <pattern>     List secret names matching pattern (case insensitive)
+  --popup              Open the interactive picker in a tmux popup
 
 Environment:
   SECRETS_DIR          Store location (${SECRETS_DIR})
@@ -39,8 +40,18 @@ Environment:
 USAGE
 }
 
+# In a tmux popup, which closes as soon as the tool exits, report messages in
+# the status line instead of the terminal
+info() {
+  if [ -n "${SECRETS_POPUP:-}" ]; then
+    tmux display-message -l "$*"
+  else
+    echo "$*" >&2
+  fi
+}
+
 die() {
-  echo "secrets: $*" >&2
+  info "secrets: $*"
   exit 1
 }
 
@@ -161,9 +172,9 @@ cmd_init() {
   list_names | while IFS= read -r name; do
     decrypt "${name}" </dev/null | encrypt_to "$(secret_path "${name}")" ||
       die "failed to re-encrypt ${name}"
-    echo "Re-encrypted ${name}" >&2
+    info "Re-encrypted ${name}"
   done || exit
-  echo "Store initialized in ${SECRETS_DIR} for: $*" >&2
+  info "Store initialized in ${SECRETS_DIR} for: $*"
 }
 
 cmd_add() {
@@ -173,7 +184,7 @@ cmd_add() {
   [ ! -e "$(secret_path "$1")" ] || die "secret already exists: $1 (use edit)"
   read_value "$1"
   printf '%s' "${VALUE}" | encrypt_to "$(secret_path "$1")" || die "failed to encrypt $1"
-  echo "Added $1" >&2
+  info "Added $1"
 }
 
 cmd_edit() {
@@ -182,7 +193,7 @@ cmd_edit() {
   require_secret "$1"
   read_value "$1"
   printf '%s' "${VALUE}" | encrypt_to "$(secret_path "$1")" || die "failed to encrypt $1"
-  echo "Updated $1" >&2
+  info "Updated $1"
 }
 
 cmd_mv() {
@@ -194,7 +205,7 @@ cmd_mv() {
   mkdir -p "$(dirname "$(secret_path "$2")")" || exit
   mv "$(secret_path "$1")" "$(secret_path "$2")" || exit
   prune_empty_dirs
-  echo "Renamed $1 to $2" >&2
+  info "Renamed $1 to $2"
 }
 
 cmd_rm() {
@@ -212,7 +223,7 @@ cmd_rm() {
   fi
   rm -f "$(secret_path "$1")" || exit
   prune_empty_dirs
-  echo "Removed $1" >&2
+  info "Removed $1"
 }
 
 cmd_show() {
@@ -231,9 +242,11 @@ cmd_copy() {
   value="$(decrypt "$1")" || die "failed to decrypt $1"
   printf '%s' "${value}" | clip_copy || die "failed to copy to clipboard"
 
-  # Clear the clipboard later, unless something else has been copied meanwhile
+  # Clear the clipboard later, unless something else has been copied meanwhile.
+  # Ignore SIGHUP, sent when the terminal (e.g. a tmux popup) closes.
   checksum="$(printf '%s' "${value}" | cksum)"
   (
+    trap '' HUP
     sleep "${SECRETS_CLIP_TIME}"
     if [ "$(clip_paste | cksum)" = "${checksum}" ]; then
       printf '' | clip_copy
@@ -241,7 +254,7 @@ cmd_copy() {
   ) </dev/null >/dev/null 2>&1 &
   disown
 
-  echo "Copied $1 to clipboard, clearing in ${SECRETS_CLIP_TIME}s" >&2
+  info "Copied $1 to clipboard, clearing in ${SECRETS_CLIP_TIME}s"
 }
 
 cmd_search() {
@@ -257,15 +270,17 @@ prompt_name() {
 
 cmd_interactive() {
   local out query key name new_name
+  # A popup already has a border: take it whole
+  local layout=(--height=40% --border)
 
   command -v fzf >/dev/null 2>&1 || die "fzf required"
   require_store
+  [ -n "${SECRETS_POPUP:-}" ] && layout=(--height=100%)
 
   while true; do
     out="$(list_names | fzf \
-      --height=40% \
+      "${layout[@]}" \
       --layout=reverse \
-      --border \
       --prompt='secret> ' \
       --print-query \
       --expect=ctrl-a,ctrl-e,ctrl-d,ctrl-r \
@@ -306,11 +321,20 @@ cmd_interactive() {
   done
 }
 
+# Opens the interactive picker in a tmux popup, closed when the picker exits.
+# GPG_TTY is reset as the one inherited from tmux may belong to another pane.
+popup() {
+  [ -n "${TMUX:-}" ] || die "not in a tmux session"
+  tmux display-popup -E -w 60% -h 60% -T " secrets " \
+    "SECRETS_POPUP=1 GPG_TTY= $(printf '%q' "$0")"
+}
+
 command="${1:-}"
 [ $# -gt 0 ] && shift
 
 case "${command}" in
 "") cmd_interactive ;;
+--popup) popup ;;
 init) cmd_init "$@" ;;
 add) cmd_add "$@" ;;
 edit) cmd_edit "$@" ;;

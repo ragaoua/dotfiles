@@ -207,7 +207,8 @@ secrets init <gpg-id>
 
 `Ctrl-x s` opens an fzf picker: `Enter` copies the selected secret to the
 clipboard (cleared after 45s, see `SECRETS_CLIP_TIME`), `C-a` adds a secret
-named after the query, `C-e` edits, `C-d` deletes and `C-r` renames.
+named after the query, `C-e` edits, `C-d` deletes and `C-r` renames. In tmux
+(after `make tmux`), `<prefix> C-s` opens the same picker in a popup.
 
 From the command line, see `secrets --help`. Values are prompted for (hidden),
 or read from stdin, e.g. `secrets add ssh/key < key.pem`.
