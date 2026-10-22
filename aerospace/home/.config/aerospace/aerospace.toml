@@ -131,9 +131,8 @@ check-further-callbacks = true
       end tell'
     '''
     alt-o = '''exec-and-forget osascript -e '
-      tell application "Safari"
-          make new document at end of documents
-          activate
+      tell application "Google Chrome"
+          make new window
       end tell'
     '''
 
