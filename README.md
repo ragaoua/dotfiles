@@ -226,3 +226,19 @@ make tig
 brew install tmux fzf fd
 make tmux
 ```
+
+## Todo
+
+```bash
+make todo
+make tmux
+```
+
+A to-do list as plain files in `~/.local/share/todo` (override with `TODO_DIR`):
+each category is a directory, and each to-do a file in it (named e.g. after its
+creation time) containing the to-do text.
+
+`<prefix> T` opens that directory in a tmux popup, with `$VISUAL`/`$EDITOR`
+(with Neovim, in neo-tree with every category expanded).
+
+From the command line, `todo` opens it in the terminal. See `todo --help`.

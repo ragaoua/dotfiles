@@ -97,3 +97,9 @@ tmux:
 	stow --no-folding --dir tmux --target "$(HOME)" home
 	tmux source-file "$(HOME)/.config/tmux/tmux.conf"
 	@echo "Tmux config installed and applied"
+
+.PHONY: todo
+todo:
+	sudo stow --no-folding --dir todo --target "/usr/local/bin" bin
+	sudo stow --dir todo --target /etc/profile.d profile.d
+	@echo "Todo installed"
