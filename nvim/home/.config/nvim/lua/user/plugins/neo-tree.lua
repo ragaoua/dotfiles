@@ -7,6 +7,21 @@ return {
 		"MunifTanjim/nui.nvim",
 	},
 	lazy = false,
+	init = function()
+		-- When started on a directory (e.g. "nvim ."), show only the tree, without
+		-- the empty window next to it. Opening a file splits the tree back into a
+		-- sidebar.
+		vim.api.nvim_create_autocmd("VimEnter", {
+			once = true,
+			callback = function()
+				if vim.fn.argc() ~= 1 or vim.fn.isdirectory(vim.fn.argv(0)) == 0 then
+					return
+				end
+				vim.cmd("Neotree")
+				vim.cmd("only")
+			end,
+		})
+	end,
 	keys = {
 		{
 			"<leader>e",
