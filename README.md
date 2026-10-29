@@ -161,12 +161,6 @@ make notes
 make tmux
 ```
 
-`<prefix> N` opens the note of the current pane's project in a tmux popup, with
-`$VISUAL`/`$EDITOR`. Quitting the editor closes the popup.
-
-From the command line, `notes` opens the current project's note in the terminal.
-See `notes --help`.
-
 ## Opencode
 
 (Eventually) backup the current config :
@@ -194,9 +188,6 @@ make podman
 
 ## Secrets
 
-A small secrets manager: each secret (a name and a value) is stored as a
-gpg-encrypted file in `~/.local/share/secrets` (override with `SECRETS_DIR`).
-
 ```bash
 brew install gnupg fzf
 make secrets
@@ -204,14 +195,6 @@ make secrets
 # If needed, create a key first: gpg --full-generate-key
 secrets init <gpg-id>
 ```
-
-`Ctrl-x s` opens an fzf picker: `Enter` copies the selected secret to the
-clipboard (cleared after 45s, see `SECRETS_CLIP_TIME`), `C-a` adds a secret
-named after the query, `C-e` edits, `C-d` deletes and `C-r` renames. In tmux
-(after `make tmux`), `<prefix> C-s` opens the same picker in a popup.
-
-From the command line, see `secrets --help`. Values are prompted for (hidden),
-or read from stdin, e.g. `secrets add ssh/key < key.pem`.
 
 ## Tig
 
@@ -233,12 +216,3 @@ make tmux
 make todo
 make tmux
 ```
-
-A to-do list as plain files in `~/.local/share/todo` (override with `TODO_DIR`):
-each category is a directory, and each to-do a file in it (named e.g. after its
-creation time) containing the to-do text.
-
-`<prefix> T` opens that directory in a tmux popup, with `$VISUAL`/`$EDITOR`
-(with Neovim, in neo-tree with every category expanded).
-
-From the command line, `todo` opens it in the terminal. See `todo --help`.
