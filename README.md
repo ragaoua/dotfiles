@@ -93,6 +93,24 @@ brew install --cask karabiner-elements
 make karabiner
 ```
 
+## Kp
+
+```bash
+brew install --cask keepassxc
+brew install gnupg fzf
+make kp
+```
+
+```bash
+# IF NEEDED, create a key
+gpg --full-generate-key
+# Init kp once (again whenever the keepass db's password changes)
+kp init <gpg-key-id>
+# kp points at ~/.local/share/kp/db.kdbx by default; create a db there,
+# override with KEEPASS_DB, or symlink a db at that location
+mkdir -p "$HOME/.local/share/kp" && ln -s <db-path> "$HOME/.local/share/kp/db.kdbx"
+```
+
 ## Kubernetes
 
 ```bash

@@ -43,6 +43,12 @@ karabiner:
 	stow --no-folding --dir karabiner --target "$(HOME)" home
 	@echo "Karabiner config installed"
 
+.PHONY: kp
+kp:
+	sudo stow --no-folding --dir kp --target "/usr/local/bin" bin
+	sudo stow --dir kp --target /etc/profile.d profile.d
+	@echo "Kp installed"
+
 .PHONY: kubernetes
 kubernetes:
 	sudo stow --dir kubernetes --target /etc/profile.d profile.d
