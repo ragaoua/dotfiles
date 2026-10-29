@@ -321,11 +321,16 @@ cmd_interactive() {
   done
 }
 
-# Opens the interactive picker in a tmux popup, closed when the picker exits.
+# Opens the interactive picker in a tmux popup, closed when the picker exits,
+# styled after the catppuccin theme when it's loaded.
 # GPG_TTY is reset as the one inherited from tmux may belong to another pane.
 popup() {
+  local color
+
   [ -n "${TMUX:-}" ] || die "not in a tmux session"
-  tmux display-popup -E -w 60% -h 60% -T " secrets " \
+  color="$(tmux show-options -gqv @thm_yellow)"
+  tmux display-popup -E -w 60% -h 60% -b rounded -S "fg=${color:-default}" \
+    -T " 󰌾 secrets " \
     "SECRETS_POPUP=1 GPG_TTY= $(printf '%q' "$0")"
 }
 
