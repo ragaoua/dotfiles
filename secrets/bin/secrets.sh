@@ -146,7 +146,7 @@ clip_copy() {
   elif command -v xclip >/dev/null 2>&1; then
     xclip -selection clipboard
   else
-    die "no clipboard tool found (pbcopy, wl-copy or xclip)"
+    die "no clipboard tool found (osascript, wl-copy or xclip)"
   fi
 }
 
