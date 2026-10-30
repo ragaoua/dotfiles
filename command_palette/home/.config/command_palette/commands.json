@@ -2,5 +2,9 @@
   {
     "title": "Kubernetes, kubectl - list pods in every namespace",
     "command": "kubectl get pods --all-namespaces"
+  },
+  {
+    "title": "String url encoding",
+    "command": "jq -rn --arg p $pass '$p|@uri'"
   }
 ]
