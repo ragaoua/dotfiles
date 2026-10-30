@@ -14,7 +14,7 @@ __command_palette() {
 
 if [[ $- == *i* ]]; then
   if ((BASH_VERSINFO[0] < 4)); then
-    bind -m emacs-standard '"\C-xx": "\C-e \C-u\C-y\ey\C-u`__command_palette`\e\C-e\er"'
+    bind -m emacs-standard '"\C-xx": "\C-e \C-u\C-y\ey\C-u`__command_palette`\e\C-e"'
   else
     bind -m emacs-standard -x '"\C-xx": __command_palette'
   fi
