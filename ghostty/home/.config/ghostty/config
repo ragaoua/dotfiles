@@ -1,4 +1,4 @@
-command = /bin/bash -l -c "tmux new-session -A -s root"
+command = /opt/homebrew/bin/bash -l -c "tmux new-session -A -s root"
 
 theme = catppuccin-macchiato
 
