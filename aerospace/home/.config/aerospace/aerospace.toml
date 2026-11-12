@@ -64,7 +64,17 @@ persistent-workspaces = []
 # A callback that runs every time binding mode changes
 # See: https://nikitabobko.github.io/AeroSpace/guide#binding-modes
 # See: https://nikitabobko.github.io/AeroSpace/commands#mode
-on-mode-changed = []
+# Turn the borders red while in passthrough mode, so it's obvious alt is
+# no longer handled by AeroSpace
+on-mode-changed = [
+  '''exec-and-forget /bin/bash -c '
+    if [ "$(aerospace list-modes --current)" = passthrough ]; then
+      borders active_color=0xffed8796
+    else
+      borders active_color=0xffe1e3e4
+    fi'
+  '''
+]
 
 focus-follows-mouse.enabled = false
 
@@ -227,6 +237,7 @@ check-further-callbacks = true
     ###########################################################################
     ###########################################################################
     alt-shift-comma = 'mode service'
+    alt-esc = 'mode passthrough'
 
 [mode.service.binding]
     esc = ['mode main']
@@ -234,3 +245,8 @@ check-further-callbacks = true
     r = ['flatten-workspace-tree', 'mode main'] # reset layout
     f = ['layout floating tiling', 'mode main'] # Toggle between floating and tiling layout
     backspace = ['close-all-windows-but-current', 'mode main']
+
+# Passthrough: alt-esc enters, alt-esc leaves. Every other key, alt-* included,
+# goes straight to the focused app
+[mode.passthrough.binding]
+    alt-esc = 'mode main'
