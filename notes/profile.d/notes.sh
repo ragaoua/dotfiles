@@ -1,1 +1,0 @@
-alias notes='notes.sh'
