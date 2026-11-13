@@ -109,3 +109,8 @@ todo:
 	sudo stow --no-folding --dir todo --target "/usr/local/bin" bin
 	sudo stow --dir todo --target /etc/profile.d profile.d
 	@echo "Todo installed"
+
+.PHONY: hex
+hex:
+	stow --no-folding --dir hex --target "$(HOME)" home
+	@echo "Hex config installed. Restart Hex to apply"

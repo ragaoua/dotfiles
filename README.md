@@ -86,6 +86,20 @@ Then reload the Ghostty config (Cmd + Shift + ,).
 make git
 ```
 
+## Hex
+
+Prerequisites: [OpenCode](#opencode)
+
+Quit Hex, move any existing `~/Library/Application Support/hex/settings.json`
+out of the way, then:
+
+```bash
+make hex
+```
+
+The config uses OpenCode (for meeting transcripts summarization and dictation
+rewrite), so make sure to set it up properly.
+
 ## Karabiner
 
 ```bash
@@ -179,7 +193,7 @@ make notes
 make tmux
 ```
 
-## Opencode
+## OpenCode
 
 (Eventually) backup the current config :
 
