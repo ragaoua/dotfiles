@@ -56,6 +56,7 @@ return {
 					mappings = {
 						i = {
 							["<c-h>"] = enable_ff_no_ignore,
+							["<c-f>"] = require("telescope.actions").to_fuzzy_refine,
 						},
 					},
 				},
@@ -64,6 +65,7 @@ return {
 					mappings = {
 						i = {
 							["<c-h>"] = enable_lg_no_ignore,
+							["<c-f>"] = require("telescope.actions").to_fuzzy_refine,
 						},
 					},
 				},
