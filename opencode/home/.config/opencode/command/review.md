@@ -1,21 +1,26 @@
 ---
-description: Review of the code changes
+description: Review code changes
 ---
 
 # Review
 
-Review the code.
+Review the code changes.
 
 ## Summary
 
 What changed? (affected modules/layers, functional vs technical changes, overall
-intent)
+intent).
+
+Unless instructed otherwise, only consider the working tree's diff. If you find
+none, ask the user for clarification.
 
 ## The actual review
 
 ### Critical Issues (if any)
 
-- Bugs, security vulnerabilities, or breaking changes
+- Bugs or security gaps
+- Breaking changes for existing consumers: call sites elsewhere in the codebase,
+  and external clients of an API, library, or CLI
 - Logic errors or edge cases not handled
 
 ### Architecture & Design
@@ -44,7 +49,7 @@ intent)
 
 ## Additional instructions
 
-- Put a number in front of every finding so it can be referenced easily.
-- Include code examples for non-obvious recommendations.
+- Put a number in front of every finding so it can be referenced easily
+- Include code examples for non-obvious recommendations
 - Focus on issues introduced or made worse by the current changes. If you find
   pre-existing problems, mention them briefly at the end
