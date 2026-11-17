@@ -238,9 +238,6 @@ return {
 						},
 					},
 				},
-
-				-- spell-checking
-				cspell_ls = {}, -- Linter LSP
 			}
 
 			local tools = {
