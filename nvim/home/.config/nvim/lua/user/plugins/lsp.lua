@@ -61,10 +61,69 @@ return {
 						end
 					end
 					local telescope = require("telescope.builtin")
+					-- Run an LSP jump, optionally in a new split (only splits once a result is found).
+					-- Duplicate locations (e.g. several servers answering) are merged; with several
+					-- distinct results, jump to the first and put them all in the quickfix list.
+					local jump = function(lsp_fn, split_cmd)
+						return function()
+							local from = vim.fn.getpos(".")
+							from[1] = vim.api.nvim_get_current_buf()
+							local tagname = vim.fn.expand("<cword>")
+							lsp_fn({
+								on_list = function(options)
+									local items, seen = {}, {}
+									for _, item in ipairs(options.items) do
+										local key = item.filename .. ":" .. item.lnum .. ":" .. item.col
+										if not seen[key] then
+											seen[key] = true
+											table.insert(items, item)
+										end
+									end
+									if #items == 0 then
+										vim.notify("No locations found", vim.log.levels.INFO)
+										return
+									end
+									vim.cmd("normal! m'")
+									if split_cmd then
+										vim.cmd(split_cmd)
+									end
+									-- Keep <C-t> working, like the default jump
+									vim.fn.settagstack(0, { items = { { tagname = tagname, from = from } } }, "t")
+									local item = items[1]
+									vim.cmd.edit(vim.fn.fnameescape(item.filename))
+									vim.api.nvim_win_set_cursor(0, { item.lnum, item.col - 1 })
+									vim.cmd("normal! zvzz")
+									if #items > 1 then
+										vim.fn.setqflist({}, " ", { title = options.title, items = items })
+										vim.notify(#items .. " locations, see :copen", vim.log.levels.INFO)
+									end
+								end,
+							})
+						end
+					end
 
-					-- Add "goto" keymaps to default ones
-					map("n", "grd", vim.lsp.buf.definition, "[G]oto [R]eference [D]efinition")
-					map("n", "grD", vim.lsp.buf.declaration, "[G]oto [R]eference [D]eclaration")
+					-- Goto keymaps (grd/grD/gri in place, grs<x> = vertical split, grS<x> = horizontal split)
+					local jumps = {
+						d = { vim.lsp.buf.definition, "Definition" },
+						D = { vim.lsp.buf.declaration, "Declaration" },
+						t = { vim.lsp.buf.type_definition, "Type Definition" },
+						i = { vim.lsp.buf.implementation, "Implementation" },
+					}
+					local ok, wk = pcall(require, "which-key")
+					if ok then
+						wk.add({
+							{ "grs", group = "Goto in Vertical [S]plit", buffer = event.buf },
+							{ "grS", group = "Goto in Horizontal [S]plit", buffer = event.buf },
+						})
+					end
+					for key, j in pairs(jumps) do
+						local fn, name = j[1], j[2]
+						if key ~= "t" then -- grt stays on telescope
+							map("n", "gr" .. key, jump(fn), "[G]oto [R]eference " .. name)
+						end
+						map("n", "grs" .. key, jump(fn, "vsplit"), name .. " in Vertical [S]plit")
+						map("n", "grS" .. key, jump(fn, "split"), name .. " in Horizontal [S]plit")
+					end
 					map({ "n", "x" }, "gra", vim.lsp.buf.code_action, "[C]ode [A]ction")
 					map("n", "grf", source_action("source.fixAll"), "[C]ode [F]ix All")
 					map("n", "gro", source_action("source.organizeImports"), "[C]ode [O]rganize Imports")
