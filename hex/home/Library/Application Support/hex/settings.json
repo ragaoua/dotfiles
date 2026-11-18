@@ -96,7 +96,7 @@
       "transformations": [],
       "post_processing": {
         "enabled": true,
-        "prompt": "Rewrite the transcript into clear, natural text while preserving the speaker's intended meaning.",
+        "prompt": "Rewrite the transcript into clear, natural text while preserving the speaker's intended meaning and language.\n\nThe speaker may give you spoken instructions inside the dictation. Anything introduced by \"note for the agent\", \"note to the agent\", \"agent note\", or the same in French (\"note pour l'agent\") is an instruction to you, not text to keep. Follow it, then remove the note itself (and an optional closing \"end note\" / \"fin de la note\") from the output. Examples:\n- \"delete what I just said\" / \"scratch that\": drop the sentence or phrase just before the note.\n- \"delete everything before this\": keep only what comes after the note.\n- \"make this more formal\", \"turn this into a bullet list\", \"translate to English\": apply it to the whole text.\n- \"I meant X, not Y\": fix the earlier text.\nIf there is no such note, just rewrite as usual. Output only the final text, never the notes or any comment about them.",
         "model": "claude-agent/haiku",
         "variant": null,
         "deadline_seconds": 30
