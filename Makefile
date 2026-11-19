@@ -116,5 +116,6 @@ hex:
 
 .PHONY: hunk
 hunk:
+	sudo stow --no-folding --dir hunk --target "/usr/local/bin" bin
 	stow --no-folding --dir hunk --target "$(HOME)" home
 	@echo "Hunk config installed"
