@@ -100,6 +100,16 @@ make hex
 The config uses OpenCode (for meeting transcripts summarization and dictation
 rewrite), so make sure to set it up properly.
 
+## Hunk
+
+```bash
+brew install hunk
+
+# Move the existing config `~/.config/hunk/config.toml` out of the way
+mv "${HOME}/.config/hunk/config.toml" "${HOME}/.config/hunk/config.toml.bak"
+make hunk
+```
+
 ## Karabiner
 
 ```bash

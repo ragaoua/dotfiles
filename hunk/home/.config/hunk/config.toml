@@ -1,0 +1,15 @@
+theme = "catppuccin-macchiato"
+mode = "auto"
+line_numbers = true
+wrap_lines = false
+hunk_headers = false
+menu_bar = false
+agent_notes = true
+copy_decorations = false
+cursor_line = "row"
+transparent_background = true
+animations = false
+file_gap = 2
+hunk_gap = 0
+color_moved = true
+prompt_save_view_preferences = false

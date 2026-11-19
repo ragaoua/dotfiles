@@ -114,3 +114,8 @@ todo:
 hex:
 	stow --no-folding --dir hex --target "$(HOME)" home
 	@echo "Hex config installed. Restart Hex to apply"
+
+.PHONY: hunk
+hunk:
+	stow --no-folding --dir hunk --target "$(HOME)" home
+	@echo "Hunk config installed"
