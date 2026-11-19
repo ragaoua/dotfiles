@@ -1,6 +1,6 @@
 __command_palette() {
   local selected_command
-  selected_command="$(command_palette.sh)" || return
+  selected_command="$(command_palette)" || return
 
   [[ -n "${selected_command}" ]] || return 0
 

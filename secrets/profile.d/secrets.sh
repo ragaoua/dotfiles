@@ -1,5 +1,3 @@
-alias secrets='secrets.sh'
-
 __secrets() {
   local saved_stty
 
@@ -8,7 +6,7 @@ __secrets() {
   # mode for the tool, then hand the terminal back to readline as it was.
   saved_stty="$(stty -g </dev/tty)"
   stty icrnl icanon echo </dev/tty
-  GPG_TTY="$(tty)" secrets.sh </dev/tty
+  GPG_TTY="$(tty)" secrets </dev/tty
   stty "${saved_stty}" </dev/tty
 }
 

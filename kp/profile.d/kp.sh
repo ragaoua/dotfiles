@@ -1,5 +1,3 @@
-alias kp='kp.sh'
-
 __kp() {
   local saved_stty
 
@@ -8,7 +6,7 @@ __kp() {
   # mode for the tool, then hand the terminal back to readline as it was.
   saved_stty="$(stty -g </dev/tty)"
   stty icrnl icanon echo </dev/tty
-  GPG_TTY="$(tty)" kp.sh </dev/tty
+  GPG_TTY="$(tty)" kp </dev/tty
   stty "${saved_stty}" </dev/tty
 }
 
