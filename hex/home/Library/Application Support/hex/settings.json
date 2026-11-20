@@ -70,7 +70,7 @@
   "show_dock_icon": true,
   "transcription": {
     "model": "parakeet_v3",
-    "language": "en"
+    "language": "auto"
   },
   "transcription_device": "auto",
   "transcription_recents": [
@@ -80,7 +80,7 @@
     },
     {
       "model": "parakeet_v3",
-      "language": "en"
+      "language": "auto"
     }
   ],
   "keyboard_model_switching": {
