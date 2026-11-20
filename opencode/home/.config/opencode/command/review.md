@@ -53,3 +53,11 @@ none, ask the user for clarification.
 - Include code examples for non-obvious recommendations
 - Focus on issues introduced or made worse by the current changes. If you find
   pre-existing problems, mention them briefly at the end
+- Every time you mention a file, class, method, function, or other symbol,
+  prefix it with a marker showing its status in this change:
+  - 🟢 added
+  - 🟡 modified
+  - 🔴 removed
+  - (no marker) untouched
+
+  Example: 🟡 `auth/session.ts` › 🟢 `refreshToken()`
