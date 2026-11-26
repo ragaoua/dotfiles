@@ -1,0 +1,436 @@
+#!/bin/bash
+
+# Manage named environments: sets of environment variables, loaded on demand
+# instead of living in .env files. Each environment (namespace) is a directory
+# of ENVX_DIR, holding one file per variable. A variable can be protected: it is
+# then gpg-encrypted (<VAR>.gpg), and gpg-agent caches the passphrase, so that
+# reading several protected variables prompts only once.
+# Compatible with the bash 3.2 shipped with macOS.
+
+set -o pipefail
+umask 077
+
+ENVX_DIR="${ENVX_DIR:-${XDG_DATA_HOME:-${HOME}/.local/share}/envx}"
+GPG_ID_FILE="${ENVX_DIR}/.gpg-id"
+NS_PATTERN='^[A-Za-z0-9_][A-Za-z0-9_.-]*$'
+VAR_PATTERN='^[A-Za-z_][A-Za-z0-9_]*$'
+
+if [ -z "${GPG_TTY:-}" ] && tty -s; then
+  GPG_TTY="$(tty)"
+  export GPG_TTY
+fi
+
+usage() {
+  cat <<USAGE
+Usage: envx <command> [args]
+
+Commands:
+  init <gpg-id>...             Set the gpg key(s) protected variables are encrypted for
+                               (re-encrypts existing ones)
+  ls [<ns>]                    List namespaces, or the variables of a namespace
+  get <ns> <VAR>               Print the value of a variable
+  set [-p] <ns> <VAR>          Set a variable (value prompted, or read from stdin),
+                               protected with -p. A protected variable stays protected.
+  rm [-f] <ns> [<VAR>]         Remove a variable, or a whole namespace
+  protect <ns> <VAR>...        Encrypt variables
+  unprotect <ns> <VAR>...      Decrypt variables back to plain files
+  run <ns> [<VAR>...] -- <cmd> Run a command with the namespace's variables (or only the given ones)
+  shell <ns>                   Start \$SHELL with the namespace's variables
+  export <ns> [<VAR>...]       Print variables in .env format
+
+Reading protected variables prompts for the gpg passphrase once, then gpg-agent
+caches it (default-cache-ttl, 10 minutes by default).
+
+Environment:
+  ENVX_DIR                     Store location (${ENVX_DIR})
+USAGE
+}
+
+info() {
+  echo "$*" >&2
+}
+
+die() {
+  info "envx: $*"
+  exit 1
+}
+
+validate_ns() {
+  [[ "$1" =~ ${NS_PATTERN} ]] || die "invalid namespace: '$1' (allowed: A-Z a-z 0-9 _ . -, not starting with '.' or '-')"
+}
+
+validate_var() {
+  [[ "$1" =~ ${VAR_PATTERN} ]] || die "invalid variable name: '$1'"
+}
+
+ns_dir() {
+  printf '%s/%s' "${ENVX_DIR}" "$1"
+}
+
+plain_path() {
+  printf '%s/%s' "$(ns_dir "$1")" "$2"
+}
+
+protected_path() {
+  printf '%s/%s.gpg' "$(ns_dir "$1")" "$2"
+}
+
+# Prints "protected", "plain", or nothing when the variable doesn't exist
+var_state() {
+  if [ -f "$(protected_path "$1" "$2")" ]; then
+    echo protected
+  elif [ -f "$(plain_path "$1" "$2")" ]; then
+    echo plain
+  fi
+}
+
+require_gpg() {
+  command -v gpg >/dev/null 2>&1 || die "gpg required"
+}
+
+require_store() {
+  require_gpg
+  [ -r "${GPG_ID_FILE}" ] || die "store not initialized, run: envx init <gpg-id>"
+}
+
+require_ns() {
+  validate_ns "$1"
+  [ -d "$(ns_dir "$1")" ] || die "no such namespace: $1"
+}
+
+require_var() {
+  validate_var "$2"
+  [ -n "$(var_state "$1" "$2")" ] || die "no such variable: $1/$2"
+}
+
+# Names only contain [A-Za-z0-9_.-], so the lists below are safe to word-split
+list_namespaces() {
+  local dir name
+
+  [ -d "${ENVX_DIR}" ] || return 0
+  for dir in "${ENVX_DIR}"/*/; do
+    [ -d "${dir}" ] || continue
+    name="$(basename "${dir}")"
+    [[ "${name}" =~ ${NS_PATTERN} ]] && echo "${name}"
+  done
+}
+
+# Skips anything that isn't a variable, such as the temporary files of an
+# interrupted write (VAR.XXXXXX)
+list_vars() {
+  local file name
+
+  for file in "$(ns_dir "$1")"/*; do
+    [ -f "${file}" ] || continue
+    name="$(basename "${file}")"
+    name="${name%.gpg}"
+    [[ "${name}" =~ ${VAR_PATTERN} ]] && echo "${name}"
+  done | sort -u
+}
+
+# Writes stdin to the given file, atomically
+write_plain() {
+  local path="$1" tmp
+
+  tmp="$(mktemp "${path}.XXXXXX")" || return
+  if cat >"${tmp}"; then
+    mv -f "${tmp}" "${path}"
+  else
+    rm -f "${tmp}"
+    return 1
+  fi
+}
+
+# Encrypts stdin into the given file, atomically. Only needs the public key:
+# never prompts.
+encrypt_to() {
+  local path="$1" tmp line
+  local recipients=()
+
+  while IFS= read -r line || [ -n "${line}" ]; do
+    [ -n "${line}" ] && recipients+=(--recipient "${line}")
+  done <"${GPG_ID_FILE}"
+  [ "${#recipients[@]}" -gt 0 ] || die "no gpg id in ${GPG_ID_FILE}"
+
+  tmp="$(mktemp "${path}.XXXXXX")" || return
+  if gpg --quiet --yes --batch --no-encrypt-to "${recipients[@]}" \
+    --encrypt --output "${tmp}"; then
+    mv -f "${tmp}" "${path}"
+  else
+    rm -f "${tmp}"
+    return 1
+  fi
+}
+
+# Prints the value of a variable. Only protected variables involve gpg, which
+# prompts unless gpg-agent has the passphrase cached.
+read_var() {
+  case "$(var_state "$1" "$2")" in
+  protected) gpg --quiet --decrypt "$(protected_path "$1" "$2")" ;;
+  plain) cat "$(plain_path "$1" "$2")" ;;
+  *) return 1 ;;
+  esac
+}
+
+# Sets VALUE from stdin when it isn't a tty, otherwise from a prompt: hidden and
+# confirmed for protected variables. Trailing newlines are dropped.
+read_value() {
+  local label="$1" hidden="$2" confirm
+
+  if [ ! -t 0 ]; then
+    VALUE="$(cat)"
+  elif [ "${hidden}" = 1 ]; then
+    IFS= read -rs -p "Value for ${label}: " VALUE
+    echo >&2
+    IFS= read -rs -p "Confirm value: " confirm
+    echo >&2
+    [ "${VALUE}" = "${confirm}" ] || die "values do not match"
+  else
+    IFS= read -r -p "Value for ${label}: " VALUE
+  fi
+}
+
+# Exports the given variables of a namespace (all of them when none is given)
+# into the current process. Stops at the first failure, such as a cancelled
+# passphrase prompt, rather than prompting again for the next variable.
+load_env() {
+  local ns="$1" var value
+  shift
+
+  require_ns "${ns}"
+  [ $# -gt 0 ] || set -- $(list_vars "${ns}")
+  for var in "$@"; do
+    require_var "${ns}" "${var}"
+  done
+  for var in "$@"; do
+    value="$(read_var "${ns}" "${var}")" || die "failed to read ${ns}/${var}"
+    export "${var}=${value}"
+  done
+}
+
+cmd_init() {
+  local ns var
+
+  [ $# -gt 0 ] || die "usage: envx init <gpg-id>..."
+  require_gpg
+  mkdir -p "${ENVX_DIR}" || exit
+  chmod 700 "${ENVX_DIR}"
+  printf '%s\n' "$@" >"${GPG_ID_FILE}"
+
+  for ns in $(list_namespaces); do
+    for var in $(list_vars "${ns}"); do
+      [ "$(var_state "${ns}" "${var}")" = protected ] || continue
+      gpg --quiet --decrypt "$(protected_path "${ns}" "${var}")" |
+        encrypt_to "$(protected_path "${ns}" "${var}")" ||
+        die "failed to re-encrypt ${ns}/${var}"
+      info "Re-encrypted ${ns}/${var}"
+    done
+  done
+  info "Store initialized in ${ENVX_DIR} for: $*"
+}
+
+cmd_ls() {
+  local var
+
+  if [ $# -eq 0 ]; then
+    list_namespaces
+    return
+  fi
+  [ $# -eq 1 ] || die "usage: envx ls [<ns>]"
+  require_ns "$1"
+  for var in $(list_vars "$1"); do
+    if [ "$(var_state "$1" "${var}")" = protected ]; then
+      echo "${var} (protected)"
+    else
+      echo "${var}"
+    fi
+  done
+}
+
+cmd_get() {
+  [ $# -eq 2 ] || die "usage: envx get <ns> <VAR>"
+  require_ns "$1"
+  require_var "$1" "$2"
+  read_var "$1" "$2"
+}
+
+cmd_set() {
+  local protect=0 ns var
+
+  if [ "${1:-}" = "-p" ]; then
+    protect=1
+    shift
+  fi
+  [ $# -eq 2 ] || die "usage: envx set [-p] <ns> <VAR>"
+  ns="$1"
+  var="$2"
+  validate_ns "${ns}"
+  validate_var "${var}"
+  [ "$(var_state "${ns}" "${var}")" = protected ] && protect=1
+  [ "${protect}" = 1 ] && require_store
+
+  read_value "${ns}/${var}" "${protect}"
+  mkdir -p "$(ns_dir "${ns}")" || exit
+  if [ "${protect}" = 1 ]; then
+    printf '%s' "${VALUE}" | encrypt_to "$(protected_path "${ns}" "${var}")" ||
+      die "failed to encrypt ${ns}/${var}"
+    rm -f "$(plain_path "${ns}" "${var}")"
+    info "Set ${ns}/${var} (protected)"
+  else
+    printf '%s' "${VALUE}" | write_plain "$(plain_path "${ns}" "${var}")" ||
+      die "failed to write ${ns}/${var}"
+    info "Set ${ns}/${var}"
+  fi
+}
+
+cmd_rm() {
+  local force=0 answer target
+
+  if [ "${1:-}" = "-f" ]; then
+    force=1
+    shift
+  fi
+  [ $# -eq 1 ] || [ $# -eq 2 ] || die "usage: envx rm [-f] <ns> [<VAR>]"
+  require_ns "$1"
+  if [ $# -eq 2 ]; then
+    require_var "$1" "$2"
+    target="$1/$2"
+  else
+    target="namespace $1 ($(list_vars "$1" | wc -l | tr -d ' ') variables)"
+  fi
+
+  if [ "${force}" -eq 0 ] && [ -t 0 ]; then
+    read -r -p "Remove ${target}? [y/N] " answer
+    [[ "${answer}" == [yY]* ]] || return 0
+  fi
+  if [ $# -eq 2 ]; then
+    rm -f "$(plain_path "$1" "$2")" "$(protected_path "$1" "$2")" || exit
+  else
+    rm -rf "$(ns_dir "$1")" || exit
+  fi
+  info "Removed ${target}"
+}
+
+cmd_protect() {
+  local ns="${1:-}" var
+
+  [ $# -ge 2 ] || die "usage: envx protect <ns> <VAR>..."
+  shift
+  require_store
+  require_ns "${ns}"
+  for var in "$@"; do
+    require_var "${ns}" "${var}"
+    if [ "$(var_state "${ns}" "${var}")" = protected ]; then
+      info "${ns}/${var} is already protected"
+      continue
+    fi
+    encrypt_to "$(protected_path "${ns}" "${var}")" <"$(plain_path "${ns}" "${var}")" ||
+      die "failed to encrypt ${ns}/${var}"
+    rm -f "$(plain_path "${ns}" "${var}")"
+    info "Protected ${ns}/${var}"
+  done
+}
+
+cmd_unprotect() {
+  local ns="${1:-}" var value
+
+  [ $# -ge 2 ] || die "usage: envx unprotect <ns> <VAR>..."
+  shift
+  require_gpg
+  require_ns "${ns}"
+  for var in "$@"; do
+    require_var "${ns}" "${var}"
+    if [ "$(var_state "${ns}" "${var}")" = plain ]; then
+      info "${ns}/${var} is not protected"
+      continue
+    fi
+    value="$(read_var "${ns}" "${var}")" || die "failed to decrypt ${ns}/${var}"
+    printf '%s' "${value}" | write_plain "$(plain_path "${ns}" "${var}")" ||
+      die "failed to write ${ns}/${var}"
+    rm -f "$(protected_path "${ns}" "${var}")"
+    info "Unprotected ${ns}/${var}"
+  done
+}
+
+cmd_run() {
+  local ns="${1:-}"
+  local vars=()
+
+  [ $# -gt 0 ] && shift
+  while [ $# -gt 0 ] && [ "$1" != "--" ]; do
+    vars+=("$1")
+    shift
+  done
+  [ -n "${ns}" ] && [ "${1:-}" = "--" ] && [ $# -ge 2 ] ||
+    die "usage: envx run <ns> [<VAR>...] -- <cmd> [args]"
+  shift
+
+  # "${vars[@]}" on an empty array fails under bash 3.2 with set -u, and is
+  # fine otherwise
+  load_env "${ns}" ${vars[@]+"${vars[@]}"}
+  export ENVX_NAMESPACE="${ns}"
+  exec "$@"
+}
+
+cmd_shell() {
+  [ $# -eq 1 ] || die "usage: envx shell <ns>"
+  load_env "$1"
+  export ENVX_NAMESPACE="$1"
+  info "\"$1\" environment loaded"
+  exec "${SHELL:-/bin/bash}"
+}
+
+# Prints NAME=value, quoting the value unless it only holds safe characters.
+# Single quotes, escaped as '\'', which shells and most .env parsers accept.
+dotenv_line() {
+  local name="$1" value="$2" escaped
+
+  if [[ "${value}" =~ ^[A-Za-z0-9_./:@+,=-]*$ ]]; then
+    printf '%s=%s\n' "${name}" "${value}"
+  else
+    escaped="$(
+      printf '%s' "${value}" | sed "s/'/'\\\\''/g"
+      echo x
+    )"
+    escaped="${escaped%x}"
+    printf "%s='%s'\n" "${name}" "${escaped}"
+  fi
+}
+
+cmd_export() {
+  local ns="${1:-}" var value
+
+  [ $# -ge 1 ] || die "usage: envx export <ns> [<VAR>...]"
+  shift
+  require_ns "${ns}"
+  [ $# -gt 0 ] || set -- $(list_vars "${ns}")
+  for var in "$@"; do
+    require_var "${ns}" "${var}"
+  done
+  for var in "$@"; do
+    value="$(read_var "${ns}" "${var}")" || die "failed to read ${ns}/${var}"
+    dotenv_line "${var}" "${value}"
+  done
+}
+
+command="${1:-}"
+[ $# -gt 0 ] && shift
+
+case "${command}" in
+init) cmd_init "$@" ;;
+ls) cmd_ls "$@" ;;
+get) cmd_get "$@" ;;
+set) cmd_set "$@" ;;
+rm) cmd_rm "$@" ;;
+protect) cmd_protect "$@" ;;
+unprotect) cmd_unprotect "$@" ;;
+run) cmd_run "$@" ;;
+shell) cmd_shell "$@" ;;
+export) cmd_export "$@" ;;
+_vars) [ $# -eq 1 ] && list_vars "$1" ;;
+-h | --help | help) usage ;;
+*)
+  usage >&2
+  exit 1
+  ;;
+esac

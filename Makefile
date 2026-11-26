@@ -22,6 +22,12 @@ command_palette:
 	sudo stow --dir command_palette --target /etc/profile.d profile.d
 	@echo "Command palette installed"
 
+.PHONY: envx
+envx:
+	sudo stow --no-folding --dir envx --target "/usr/local/bin" bin
+	sudo stow --dir envx --target /etc/profile.d profile.d
+	@echo "Envx installed"
+
 .PHONY: fzf
 fzf:
 	sudo stow --dir fzf --target /etc/profile.d profile.d

@@ -46,6 +46,16 @@ brew install fzf jq
 make command_palette
 ```
 
+## Envx
+
+```bash
+brew install gnupg
+make envx
+
+# If needed, create a key first: gpg --full-generate-key
+envx init <gpg-id>
+```
+
 ## Fzf
 
 ```bash
@@ -126,8 +136,8 @@ make kp
 ```
 
 ```bash
-# IF NEEDED, create a key
-gpg --full-generate-key
+# If needed, create a key first: gpg --full-generate-key
+
 # Init kp once (again whenever the keepass db's password changes)
 kp init <gpg-key-id>
 # kp points at ~/.local/share/kp/db.kdbx by default; create a db there,
