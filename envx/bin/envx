@@ -31,12 +31,18 @@ Commands:
   get <ns> <VAR>               Print the value of a variable
   set [-p] <ns> <VAR>          Set a variable (value prompted, or read from stdin),
                                protected with -p. A protected variable stays protected.
+  edit [-p] <ns> <VAR>         Edit a variable (or create it) in \$VISUAL or \$EDITOR,
+                               protected with -p. A protected variable stays protected.
   rm [-f] <ns> [<VAR>]         Remove a variable, or a whole namespace
   protect <ns> <VAR>...        Encrypt variables
   unprotect <ns> <VAR>...      Decrypt variables back to plain files
-  run <ns> [<VAR>...] -- <cmd> Run a command with the namespace's variables (or only the given ones)
-  shell <ns>                   Start \$SHELL with the namespace's variables
-  export <ns> [<VAR>...]       Print variables in .env format
+  run <nss> [<VAR>...] -- <cmd>
+                               Run a command with the namespaces' variables (or only the given ones)
+  shell <nss>                  Start \$SHELL with the namespaces' variables
+  export <nss> [<VAR>...]      Print variables in .env format
+
+<nss> is one namespace, or several separated by commas (common,myapi): a
+variable defined in several of them is taken from the last one.
 
 Reading protected variables prompts for the gpg passphrase once, then gpg-agent
 caches it (default-cache-ttl, 10 minutes by default).
@@ -190,22 +196,57 @@ read_value() {
   fi
 }
 
-# Exports the given variables of a namespace (all of them when none is given)
-# into the current process. Stops at the first failure, such as a cancelled
-# passphrase prompt, rather than prompting again for the next variable.
-load_env() {
-  local ns="$1" var value
+# Splits a comma-separated list of namespaces into NAMESPACES, each of which
+# must exist
+split_namespaces() {
+  local ns
+
+  NS_LIST="$1"
+  IFS=, read -r -a NAMESPACES <<<"$1"
+  [ "${#NAMESPACES[@]}" -gt 0 ] || die "no namespace given"
+  for ns in "${NAMESPACES[@]}"; do
+    require_ns "${ns}"
+  done
+}
+
+# Prints the namespace a variable is taken from: the last one of NAMESPACES
+# that defines it, so that later namespaces override earlier ones
+var_source() {
+  local i
+
+  for ((i = ${#NAMESPACES[@]} - 1; i >= 0; i--)); do
+    if [ -n "$(var_state "${NAMESPACES[i]}" "$1")" ]; then
+      echo "${NAMESPACES[i]}"
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Calls the given function with the name and value of the given variables of
+# NAMESPACES (all of them when none is given). Checks that they all exist
+# first, then stops at the first failure, such as a cancelled passphrase
+# prompt, rather than prompting again for the next variable.
+each_var() {
+  local fn="$1" ns var value
   shift
 
-  require_ns "${ns}"
-  [ $# -gt 0 ] || set -- $(list_vars "${ns}")
+  if [ $# -eq 0 ]; then
+    set -- $(for ns in "${NAMESPACES[@]}"; do list_vars "${ns}"; done | sort -u)
+  fi
   for var in "$@"; do
-    require_var "${ns}" "${var}"
+    validate_var "${var}"
+    var_source "${var}" >/dev/null || die "no such variable: ${var} (in ${NS_LIST})"
   done
   for var in "$@"; do
+    ns="$(var_source "${var}")"
     value="$(read_var "${ns}" "${var}")" || die "failed to read ${ns}/${var}"
-    export "${var}=${value}"
+    "${fn}" "${var}" "${value}"
   done
+}
+
+export_var() {
+  export "$1=$2"
 }
 
 cmd_init() {
@@ -270,17 +311,84 @@ cmd_set() {
   [ "${protect}" = 1 ] && require_store
 
   read_value "${ns}/${var}" "${protect}"
+  save_var "${ns}" "${var}" "${protect}" "${VALUE}"
+}
+
+# Writes a variable's value, encrypted when protect is 1
+save_var() {
+  local ns="$1" var="$2" protect="$3" value="$4"
+
   mkdir -p "$(ns_dir "${ns}")" || exit
   if [ "${protect}" = 1 ]; then
-    printf '%s' "${VALUE}" | encrypt_to "$(protected_path "${ns}" "${var}")" ||
+    printf '%s' "${value}" | encrypt_to "$(protected_path "${ns}" "${var}")" ||
       die "failed to encrypt ${ns}/${var}"
     rm -f "$(plain_path "${ns}" "${var}")"
     info "Set ${ns}/${var} (protected)"
   else
-    printf '%s' "${VALUE}" | write_plain "$(plain_path "${ns}" "${var}")" ||
+    printf '%s' "${value}" | write_plain "$(plain_path "${ns}" "${var}")" ||
       die "failed to write ${ns}/${var}"
     info "Set ${ns}/${var}"
   fi
+}
+
+# Opens the given file in the user's editor. Vim and Neovim are started without
+# swap, undo, backup and viminfo/shada files, so that the value they show,
+# possibly a decrypted secret, isn't copied anywhere else on disk.
+# The editor command goes through sh, as git does, so that it can hold quoted
+# arguments.
+open_editor() {
+  local editor="${VISUAL:-${EDITOR:-vi}}"
+  local extra=()
+
+  case "$(basename "${editor%% *}")" in
+  vi | vim | nvim)
+    # -c applies after the user's config, which may turn these back on
+    extra=(-n -i NONE -c 'set nobackup nowritebackup noundofile noswapfile')
+    ;;
+  esac
+  sh -c "${editor} \"\$@\"" "${editor}" ${extra[@]+"${extra[@]}"} "$1"
+}
+
+cmd_edit() {
+  local protect=0 ns var state file original
+
+  if [ "${1:-}" = "-p" ]; then
+    protect=1
+    shift
+  fi
+  [ $# -eq 2 ] || die "usage: envx edit [-p] <ns> <VAR>"
+  ns="$1"
+  var="$2"
+  validate_ns "${ns}"
+  validate_var "${var}"
+  state="$(var_state "${ns}" "${var}")"
+  [ "${state}" = protected ] && protect=1
+  [ "${protect}" = 1 ] && require_store
+
+  # The value sits in this file, readable only by the user, while the editor
+  # is open. It's removed however the command ends: EDIT_TMPDIR is global, as
+  # the EXIT trap runs once this function's locals are gone.
+  EDIT_TMPDIR="$(mktemp -d "${TMPDIR:-/tmp}/envx.XXXXXX")" || exit
+  trap 'rm -rf "${EDIT_TMPDIR}"' EXIT
+  trap 'exit 1' INT TERM HUP
+  file="${EDIT_TMPDIR}/${var}"
+
+  if [ -n "${state}" ]; then
+    original="$(read_var "${ns}" "${var}")" || die "failed to read ${ns}/${var}"
+  fi
+  printf '%s' "${original}" >"${file}" || exit
+
+  open_editor "${file}" || die "editor failed, ${ns}/${var} left unchanged"
+
+  # Editors usually end the file with a newline: drop trailing newlines, as
+  # set does
+  VALUE="$(cat "${file}")" || exit
+  if [ -n "${state}" ] && [ "${VALUE}" = "${original}" ] &&
+    { [ "${state}" = protected ] || [ "${protect}" = 0 ]; }; then
+    info "${ns}/${var} unchanged"
+    return 0
+  fi
+  save_var "${ns}" "${var}" "${protect}" "${VALUE}"
 }
 
 cmd_rm() {
@@ -362,19 +470,21 @@ cmd_run() {
     shift
   done
   [ -n "${ns}" ] && [ "${1:-}" = "--" ] && [ $# -ge 2 ] ||
-    die "usage: envx run <ns> [<VAR>...] -- <cmd> [args]"
+    die "usage: envx run <ns>[,<ns>...] [<VAR>...] -- <cmd> [args]"
   shift
 
+  split_namespaces "${ns}"
   # "${vars[@]}" on an empty array fails under bash 3.2 with set -u, and is
   # fine otherwise
-  load_env "${ns}" ${vars[@]+"${vars[@]}"}
+  each_var export_var ${vars[@]+"${vars[@]}"}
   export ENVX_NAMESPACE="${ns}"
   exec "$@"
 }
 
 cmd_shell() {
-  [ $# -eq 1 ] || die "usage: envx shell <ns>"
-  load_env "$1"
+  [ $# -eq 1 ] || die "usage: envx shell <ns>[,<ns>...]"
+  split_namespaces "$1"
+  each_var export_var
   export ENVX_NAMESPACE="$1"
   info "\"$1\" environment loaded"
   exec "${SHELL:-/bin/bash}"
@@ -398,19 +508,10 @@ dotenv_line() {
 }
 
 cmd_export() {
-  local ns="${1:-}" var value
-
-  [ $# -ge 1 ] || die "usage: envx export <ns> [<VAR>...]"
+  [ $# -ge 1 ] || die "usage: envx export <ns>[,<ns>...] [<VAR>...]"
+  split_namespaces "$1"
   shift
-  require_ns "${ns}"
-  [ $# -gt 0 ] || set -- $(list_vars "${ns}")
-  for var in "$@"; do
-    require_var "${ns}" "${var}"
-  done
-  for var in "$@"; do
-    value="$(read_var "${ns}" "${var}")" || die "failed to read ${ns}/${var}"
-    dotenv_line "${var}" "${value}"
-  done
+  each_var dotenv_line "$@"
 }
 
 command="${1:-}"
@@ -421,13 +522,18 @@ init) cmd_init "$@" ;;
 ls) cmd_ls "$@" ;;
 get) cmd_get "$@" ;;
 set) cmd_set "$@" ;;
+edit) cmd_edit "$@" ;;
 rm) cmd_rm "$@" ;;
 protect) cmd_protect "$@" ;;
 unprotect) cmd_unprotect "$@" ;;
 run) cmd_run "$@" ;;
 shell) cmd_shell "$@" ;;
 export) cmd_export "$@" ;;
-_vars) [ $# -eq 1 ] && list_vars "$1" ;;
+_vars)
+  # Variables of one or several (comma-separated) namespaces, for completion
+  [ $# -eq 1 ] && split_namespaces "$1" &&
+    for ns in "${NAMESPACES[@]}"; do list_vars "${ns}"; done | sort -u
+  ;;
 -h | --help | help) usage ;;
 *)
   usage >&2

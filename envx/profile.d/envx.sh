@@ -22,19 +22,25 @@ _envx() {
 
   case "${#args[@]}" in
   0)
-    COMPREPLY=($(compgen -W "init ls get set rm protect unprotect run shell export help" -- "${cur}"))
+    COMPREPLY=($(compgen -W "init ls get set edit rm protect unprotect run shell export help" -- "${cur}"))
     ;;
   1)
     case "${args[0]}" in
     init | help) ;;
-    set) COMPREPLY=($(compgen -W "-p $(envx ls 2>/dev/null)" -- "${cur}")) ;;
+    set | edit) COMPREPLY=($(compgen -W "-p $(envx ls 2>/dev/null)" -- "${cur}")) ;;
     rm) COMPREPLY=($(compgen -W "-f $(envx ls 2>/dev/null)" -- "${cur}")) ;;
+    run | shell | export)
+      # Comma-separated namespaces: complete the one after the last comma
+      local prefix=""
+      [[ "${cur}" == *,* ]] && prefix="${cur%,*},"
+      COMPREPLY=($(compgen -P "${prefix}" -W "$(envx ls 2>/dev/null)" -- "${cur##*,}"))
+      ;;
     *) COMPREPLY=($(compgen -W "$(envx ls 2>/dev/null)" -- "${cur}")) ;;
     esac
     ;;
   *)
     case "${args[0]}" in
-    get | set | rm)
+    get | set | edit | rm)
       [ "${#args[@]}" -eq 2 ] &&
         COMPREPLY=($(compgen -W "$(envx _vars "${args[1]}" 2>/dev/null)" -- "${cur}"))
       ;;
