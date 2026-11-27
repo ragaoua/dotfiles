@@ -11,7 +11,7 @@
   "capture": {
     "bundle_days": 30,
     "capsule_flow": "list",
-    "enabled": true,
+    "enabled": false,
     "folder": null,
     "hotkey": {
       "keys": [
@@ -136,6 +136,10 @@
     "gnome_annotate": false,
     "gnome_clipboard_restore": false,
     "gnome_meeting_capsules": false,
+    "groups": {
+      "annotate": true,
+      "dictation": true
+    },
     "hide_menu_bar_icon": false,
     "history_stats": false,
     "history_stats_strip": false,
